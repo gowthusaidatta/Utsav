@@ -4,13 +4,22 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const appRoles = [
-  "student",
-  "volunteer",
+  "super_admin",
+  "platform_admin",
+  "admin",
+  "org_admin",
+  "college_admin",
+  "dept_admin",
+  "faculty",
   "organizer",
   "coordinator",
+  "volunteer",
   "judge",
-  "faculty",
-  "admin",
+  "mentor",
+  "sponsor",
+  "finance",
+  "media",
+  "student",
 ] as const;
 export type AppRole = (typeof appRoles)[number];
 
