@@ -233,7 +233,6 @@ export const updateEvent = createServerFn({ method: "POST" })
 
     const { error } = await context.supabase.from("events").update(update as never).eq("id", id);
     if (error) throw new Error((error as { message: string }).message);
-    if (error) throw new Error(error.message);
 
     await context.supabase.from("audit_logs").insert({
       actor_user_id: context.userId,
