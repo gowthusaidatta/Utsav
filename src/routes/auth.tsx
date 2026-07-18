@@ -49,6 +49,8 @@ const credentialsSchema = z.object({
   fullName: z.string().trim().max(120).optional(),
 });
 
+type SignupRole = "student" | "faculty" | "coordinator" | "student_coordinator" | "guest";
+
 function AuthPage() {
   const { mode, next } = Route.useSearch();
   const navigate = useNavigate();
@@ -56,6 +58,15 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [college, setCollege] = useState("");
+  const [department, setDepartment] = useState("");
+  const [rollNumber, setRollNumber] = useState("");
+  const [facultyId, setFacultyId] = useState("");
+  const [academicYear, setAcademicYear] = useState("");
+  const [section, setSection] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [desiredRole, setDesiredRole] = useState<SignupRole>("student");
   const [busy, setBusy] = useState(false);
 
   async function handleGoogle() {
