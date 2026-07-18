@@ -90,10 +90,10 @@ function UserApprovalsPage() {
     <main className="container mx-auto max-w-6xl px-4 py-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Account approvals</h1>
-        <p className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground">
           Verify identity documents and assign a role strictly below your own rank.
           Your rank: <Badge variant="secondary">{actorRank}</Badge>
-        </p>
+        </div>
       </div>
 
       <Card>
