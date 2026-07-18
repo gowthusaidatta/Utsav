@@ -122,6 +122,17 @@ export const getMyRank = createServerFn({ method: "GET" })
     return { rank: (data as number) ?? 0 };
   });
 
+// Actor context helper for role-picker UIs.
+export const getActorContext = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("max_global_rank", {
+      _uid: context.userId,
+    });
+    if (error) throw new Error(error.message);
+    return { userId: context.userId, rank: (data as number) ?? 0 };
+  });
+
 // -----------------------------------------------------------
 // getMyRoles
 // -----------------------------------------------------------
