@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedMyRegistrationsRouteImport } from './routes/_authenticated/my-registrations'
 import { Route as AuthenticatedMyEventsRouteImport } from './routes/_authenticated/my-events'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authenticated/events.new'
@@ -63,6 +64,12 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMyRegistrationsRoute =
+  AuthenticatedMyRegistrationsRouteImport.update({
+    id: '/my-registrations',
+    path: '/my-registrations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMyEventsRoute = AuthenticatedMyEventsRouteImport.update({
   id: '/my-events',
   path: '/my-events',
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-events': typeof AuthenticatedMyEventsRoute
+  '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/events/': typeof EventsIndexRoute
@@ -118,6 +126,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-events': typeof AuthenticatedMyEventsRoute
+  '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/events': typeof EventsIndexRoute
@@ -135,6 +144,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/my-events': typeof AuthenticatedMyEventsRoute
+  '/_authenticated/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/events/': typeof EventsIndexRoute
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/my-events'
+    | '/my-registrations'
     | '/profile'
     | '/events/$slug'
     | '/events/'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/my-events'
+    | '/my-registrations'
     | '/profile'
     | '/events/$slug'
     | '/events'
@@ -183,6 +195,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/dashboard'
     | '/_authenticated/my-events'
+    | '/_authenticated/my-registrations'
     | '/_authenticated/profile'
     | '/events/$slug'
     | '/events/'
@@ -260,6 +273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/my-registrations': {
+      id: '/_authenticated/my-registrations'
+      path: '/my-registrations'
+      fullPath: '/my-registrations'
+      preLoaderRoute: typeof AuthenticatedMyRegistrationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/my-events': {
       id: '/_authenticated/my-events'
       path: '/my-events'
@@ -308,6 +328,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMyEventsRoute: typeof AuthenticatedMyEventsRoute
+  AuthenticatedMyRegistrationsRoute: typeof AuthenticatedMyRegistrationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute
@@ -318,6 +339,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMyEventsRoute: AuthenticatedMyEventsRoute,
+  AuthenticatedMyRegistrationsRoute: AuthenticatedMyRegistrationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
