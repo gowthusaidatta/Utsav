@@ -428,7 +428,7 @@ export const verifyMyPermissions = createServerFn({ method: "POST" })
       const { data: allowed, error } = await context.supabase.rpc("can", {
         _uid: uid,
         _action: action,
-        _event: data.event_id ?? null,
+        ...(data.event_id ? { _event: data.event_id } : {}),
       });
       if (error) throw new Error(`can(${action}): ${error.message}`);
       results[action] = Boolean(allowed);
