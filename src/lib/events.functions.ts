@@ -174,33 +174,31 @@ export const createEvent = createServerFn({ method: "POST" })
       slug = `${base}-${Math.random().toString(36).slice(2, 6)}`;
     }
 
-    const insertRow: Record<string, unknown> = {
-      title: data.title,
-      slug,
-      description: data.description ?? null,
-      cover_image_url: data.cover_image_url ?? null,
-      category: data.category ?? null,
-      tags: data.tags ?? [],
-      status: data.status ?? "draft",
-      visibility: data.visibility ?? "public",
-      start_at: data.start_at ?? null,
-      end_at: data.end_at ?? null,
-      timezone: data.timezone ?? "UTC",
-      venue: data.venue ?? null,
-      is_online: data.is_online ?? false,
-      meeting_url: data.meeting_url ?? null,
-      capacity: data.capacity ?? null,
-      registration_deadline: data.registration_deadline ?? null,
-      is_paid: data.is_paid ?? false,
-      price: data.price ?? 0,
-      currency: data.currency ?? "INR",
-      organization_id: data.organization_id ?? null,
-      created_by: context.userId,
-    };
-
     const { data: row, error } = await context.supabase
       .from("events")
-      .insert(insertRow)
+      .insert({
+        title: data.title,
+        slug,
+        description: data.description ?? null,
+        cover_image_url: data.cover_image_url ?? null,
+        category: data.category ?? null,
+        tags: data.tags ?? [],
+        status: data.status ?? "draft",
+        visibility: data.visibility ?? "public",
+        start_at: data.start_at ?? null,
+        end_at: data.end_at ?? null,
+        timezone: data.timezone ?? "UTC",
+        venue: data.venue ?? null,
+        is_online: data.is_online ?? false,
+        meeting_url: data.meeting_url ?? null,
+        capacity: data.capacity ?? null,
+        registration_deadline: data.registration_deadline ?? null,
+        is_paid: data.is_paid ?? false,
+        price: data.price ?? 0,
+        currency: data.currency ?? "INR",
+        organization_id: data.organization_id ?? null,
+        created_by: context.userId,
+      })
       .select("id, slug")
       .single();
     if (error) throw new Error(error.message);
