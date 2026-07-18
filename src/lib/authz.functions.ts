@@ -202,13 +202,11 @@ export const listUsersWithRoles = createServerFn({ method: "POST" })
     const byUser: Record<string, typeof active> = {};
     for (const r of active) (byUser[r.user_id] ??= []).push(r);
 
-    return {
-      actorRank,
-      users: (profiles ?? []).map((p) => ({
-        ...p,
-        roles: byUser[p.id] ?? [],
-      })),
-    };
+    return (profiles ?? []).map((p) => ({
+      ...p,
+      _actorRank: actorRank,
+      roles: byUser[p.id] ?? [],
+    }));
   });
 
 // -----------------------------------------------------------
