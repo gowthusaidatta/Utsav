@@ -110,7 +110,7 @@ export const updateRegistrationStatus = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = { status: data.status };
+    const patch: { status: typeof data.status; checked_in_at?: string } = { status: data.status };
     if (data.status === "checked_in") patch.checked_in_at = new Date().toISOString();
     const { error } = await context.supabase
       .from("registrations")
