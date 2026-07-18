@@ -65,7 +65,7 @@ function AdminUsersPage() {
   const [pending, setPending] = useState<Record<string, AppRole>>({});
 
   const assign = useMutation({
-    mutationFn: (v: { userId: string; role: (typeof ROLES)[number] }) =>
+    mutationFn: (v: { userId: string; role: AppRole }) =>
       assignFn({ data: { userId: v.userId, role: v.role, scope: "global" } }),
     onSuccess: () => {
       toast.success("Role assigned");
