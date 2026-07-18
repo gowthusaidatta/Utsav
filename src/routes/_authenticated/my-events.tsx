@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Calendar } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/events/")({
+export const Route = createFileRoute("/_authenticated/my-events")({
   head: () => ({ meta: [{ title: "My Events — Utsav" }] }),
   component: MyEvents,
 });
