@@ -571,26 +571,184 @@ export const rejectUser = createServerFn({ method: "POST" })
   });
 
 // -----------------------------------------------------------
-// verifyMyPermissions — probe several actions in one call
+// verifyMyPermissions — returns roles, delegations, and a permission map keyed by action.
+// Used by /admin/role-matrix. Accepts an optional list of actions to probe; defaults to
+// the platform's canonical action list.
 // -----------------------------------------------------------
+const DEFAULT_PROBE_ACTIONS = [
+  "view_event",
+  "create_event",
+  "edit_event",
+  "publish_event",
+  "delete_event",
+  "register",
+  "create_team",
+  "submit_project",
+  "manage_teams",
+  "approve_registration",
+  "score_submissions",
+  "check_in",
+  "issue_certificates",
+  "manage_users",
+  "manage_organizations",
+  "view_finance",
+  "manage_media",
+  "mentor_teams",
+  "sponsor_view",
+  "view_audit_logs",
+] as const;
+
 export const verifyMyPermissions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
     z
       .object({
-        actions: z.array(z.string().min(1).max(64)).min(1).max(64),
+        actions: z.array(z.string().min(1).max(64)).optional(),
+        eventId: z.string().uuid().nullable().optional(),
       })
-      .parse(input),
+      .optional()
+      .parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
-    const out: Record<string, boolean> = {};
-    for (const a of data.actions) {
+    const actions = data?.actions ?? [...DEFAULT_PROBE_ACTIONS];
+    const eventId = data?.eventId ?? undefined;
+
+    const [rolesRes, delegationsRes] = await Promise.all([
+      context.supabase
+        .from("user_roles")
+        .select("id, role, scope, scope_id, expires_at")
+        .eq("user_id", context.userId),
+      context.supabase
+        .from("permission_delegations")
+        .select("id, role, scope, scope_id, expires_at, revoked_at")
+        .eq("delegate_user_id", context.userId)
+        .is("revoked_at", null),
+    ]);
+
+    const now = Date.now();
+    const roles = (rolesRes.data ?? []).filter(
+      (r) => !r.expires_at || new Date(r.expires_at).getTime() > now,
+    );
+    const delegations = (delegationsRes.data ?? []).filter(
+      (d) => !d.expires_at || new Date(d.expires_at).getTime() > now,
+    );
+
+    const map: Record<string, boolean> = {};
+    for (const a of actions) {
       const { data: r } = await context.supabase.rpc("can", {
         _uid: context.userId,
         _action: a,
-        _event: undefined,
+        _event: eventId,
       });
-      out[a] = !!r;
+      map[a] = !!r;
     }
-    return out;
+    return { roles, delegations, actions: map };
   });
+
+// -----------------------------------------------------------
+// Delegation listing / revocation (used by /admin/delegations and /delegations)
+// -----------------------------------------------------------
+export const listAllDelegations = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .handler(async ({ context }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await requireManagerRank(context as any);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("permission_delegations")
+      .select(
+        "id, delegator_user_id, delegate_user_id, role, scope, scope_id, expires_at, revoked_at, created_at",
+      )
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const listMyDelegations = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: incoming, error: iErr } = await context.supabase
+      .from("permission_delegations")
+      .select(
+        "id, delegator_user_id, delegate_user_id, role, scope, scope_id, expires_at, revoked_at, created_at",
+      )
+      .eq("delegate_user_id", context.userId)
+      .order("created_at", { ascending: false });
+    if (iErr) throw new Error(iErr.message);
+
+    const { data: outgoing, error: oErr } = await context.supabase
+      .from("permission_delegations")
+      .select(
+        "id, delegator_user_id, delegate_user_id, role, scope, scope_id, expires_at, revoked_at, created_at",
+      )
+      .eq("delegator_user_id", context.userId)
+      .order("created_at", { ascending: false });
+    if (oErr) throw new Error(oErr.message);
+
+    return { incoming: incoming ?? [], outgoing: outgoing ?? [] };
+  });
+
+export const revokeDelegation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const meta = requestMeta();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("permission_delegations")
+      .select("delegator_user_id, delegate_user_id, role, scope, scope_id, revoked_at")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!row) throw new Error("Delegation not found");
+    if (row.revoked_at) return { ok: true };
+
+    // Delegator, delegate, or a manager who outranks the delegated role may revoke.
+    const isParticipant =
+      row.delegator_user_id === context.userId ||
+      row.delegate_user_id === context.userId;
+    let canRevoke = isParticipant;
+    if (!canRevoke) {
+      const { data: canAssign } = await context.supabase.rpc("can_assign_role", {
+        _actor: context.userId,
+        _target_role: row.role,
+      });
+      canRevoke = !!canAssign;
+    }
+    if (!canRevoke) throw new Error("Forbidden");
+
+    const { error } = await supabaseAdmin
+      .from("permission_delegations")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+
+    await supabaseAdmin.from("audit_logs").insert({
+      actor_user_id: context.userId,
+      action: "permission.revoked",
+      resource_type: "permission_delegations",
+      resource_id: data.id,
+      metadata: row,
+      ip: meta.ip,
+      user_agent: meta.user_agent,
+    });
+    return { ok: true };
+  });
+
+// -----------------------------------------------------------
+// Audit log — caller's own recent activity
+// -----------------------------------------------------------
+export const getMyAuditLog = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("audit_logs")
+      .select("id, action, resource_type, resource_id, metadata, ip, created_at")
+      .eq("actor_user_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
