@@ -193,16 +193,16 @@ function AdminUsersPage() {
                       <Select
                         value={pending[u.id] ?? ""}
                         onValueChange={(v) =>
-                          setPending({ ...pending, [u.id]: v as (typeof ROLES)[number] })
+                          setPending({ ...pending, [u.id]: v as AppRole })
                         }
                       >
                         <SelectTrigger className="h-8 w-40">
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
-                          {ROLES.map((r) => (
+                          {assignable.map((r) => (
                             <SelectItem key={r} value={r}>
-                              {ROLE_LABELS[r]}
+                              {ROLE_LABEL[r]}
                             </SelectItem>
                           ))}
                         </SelectContent>
