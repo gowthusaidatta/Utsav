@@ -68,10 +68,10 @@ export function mapDbError(err: { message?: string; code?: string; details?: str
   return errorEnvelope("DB_ERROR", "Database request failed.");
 }
 
-/** Record an audit log entry as the caller. Best-effort; never throws to the caller. */
+/** Record an audit log entry as the caller. Best-effort; never throws. */
 export async function recordAudit(
   supabase: SupabaseClient,
-  actorId: string,
+  actorId: string | undefined,
   action: string,
   resourceType?: string,
   resourceId?: string,
@@ -79,19 +79,18 @@ export async function recordAudit(
 ) {
   try {
     await supabase.from("audit_logs").insert({
-      actor_user_id: actorId,
+      actor_user_id: actorId ?? null,
       action,
       resource_type: resourceType ?? null,
       resource_id: resourceId ?? null,
       metadata: { ...(metadata ?? {}), source: "mcp" },
     });
-  } catch {
-    // swallow — audit is best-effort, never fail the tool call on log errors.
-  }
+  } catch { /* audit is best-effort */ }
 }
 
 /** Check a global role via SECURITY DEFINER RPC. */
-export async function hasGlobalRole(supabase: SupabaseClient, userId: string, role: string) {
+export async function hasGlobalRole(supabase: SupabaseClient, userId: string | undefined, role: string) {
+  if (!userId) return false;
   const { data } = await supabase.rpc("has_global_role", { _uid: userId, _role: role });
   return Boolean(data);
 }
@@ -99,15 +98,12 @@ export async function hasGlobalRole(supabase: SupabaseClient, userId: string, ro
 /** Check a scoped permission via the app-wide `can()` RPC. */
 export async function can(
   supabase: SupabaseClient,
-  userId: string,
+  userId: string | undefined,
   action: string,
   eventId?: string | null,
 ) {
-  const { data } = await supabase.rpc("can", {
-    _uid: userId,
-    _action: action,
-    _event: eventId ?? null,
-  });
+  if (!userId) return false;
+  const { data } = await supabase.rpc("can", { _uid: userId, _action: action, _event: eventId ?? null });
   return Boolean(data);
 }
 
