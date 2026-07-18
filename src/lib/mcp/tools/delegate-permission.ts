@@ -38,7 +38,6 @@ export default defineTool({
       scope: "event",
       scope_id: input.event_id,
       expires_at: input.expires_at,
-      reason: input.reason ?? null,
     }).select().maybeSingle();
     if (error) return mapDbError(error);
     await recordAudit(s, actor, "permission.delegate", "delegation", data?.id, { target: input.delegate_user_id, role: input.role, event_id: input.event_id });
