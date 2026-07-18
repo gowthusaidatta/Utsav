@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -8,6 +8,10 @@ import {
   assignRole,
   revokeRole,
   getMyAuditLog,
+  getActorContext,
+  ROLE_RANK,
+  ROLE_LABEL,
+  type AppRole,
 } from "@/lib/authz.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
