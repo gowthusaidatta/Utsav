@@ -19,12 +19,16 @@ import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedMyRegistrationsRouteImport } from './routes/_authenticated/my-registrations'
 import { Route as AuthenticatedMyEventsRouteImport } from './routes/_authenticated/my-events'
+import { Route as AuthenticatedDelegationsRouteImport } from './routes/_authenticated/delegations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authenticated/events.new'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin.organizations'
+import { Route as AuthenticatedAdminDelegationsRouteImport } from './routes/_authenticated/admin.delegations'
 import { Route as AuthenticatedEventsSlugRegisterRouteImport } from './routes/_authenticated/events.$slug.register'
 import { Route as AuthenticatedEventsIdRegistrationsRouteImport } from './routes/_authenticated/events.$id.registrations'
 import { Route as AuthenticatedEventsIdManageRouteImport } from './routes/_authenticated/events.$id.manage'
+import { Route as AuthenticatedAdminOrganizationsIdRouteImport } from './routes/_authenticated/admin.organizations.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -76,6 +80,12 @@ const AuthenticatedMyEventsRoute = AuthenticatedMyEventsRouteImport.update({
   path: '/my-events',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDelegationsRoute =
+  AuthenticatedDelegationsRouteImport.update({
+    id: '/delegations',
+    path: '/delegations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -91,6 +101,18 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminOrganizationsRoute =
+  AuthenticatedAdminOrganizationsRouteImport.update({
+    id: '/admin/organizations',
+    path: '/admin/organizations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminDelegationsRoute =
+  AuthenticatedAdminDelegationsRouteImport.update({
+    id: '/admin/delegations',
+    path: '/admin/delegations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEventsSlugRegisterRoute =
   AuthenticatedEventsSlugRegisterRouteImport.update({
     id: '/events/$slug/register',
@@ -109,6 +131,12 @@ const AuthenticatedEventsIdManageRoute =
     path: '/events/$id/manage',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminOrganizationsIdRoute =
+  AuthenticatedAdminOrganizationsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminOrganizationsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -116,13 +144,17 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/delegations': typeof AuthenticatedDelegationsRoute
   '/my-events': typeof AuthenticatedMyEventsRoute
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/events/': typeof EventsIndexRoute
+  '/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
+  '/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
+  '/admin/organizations/$id': typeof AuthenticatedAdminOrganizationsIdRoute
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
   '/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
@@ -133,13 +165,17 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/delegations': typeof AuthenticatedDelegationsRoute
   '/my-events': typeof AuthenticatedMyEventsRoute
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/events': typeof EventsIndexRoute
+  '/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
+  '/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
+  '/admin/organizations/$id': typeof AuthenticatedAdminOrganizationsIdRoute
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
   '/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
@@ -152,13 +188,17 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/delegations': typeof AuthenticatedDelegationsRoute
   '/_authenticated/my-events': typeof AuthenticatedMyEventsRoute
   '/_authenticated/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/events/': typeof EventsIndexRoute
+  '/_authenticated/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
+  '/_authenticated/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/events/new': typeof AuthenticatedEventsNewRoute
+  '/_authenticated/admin/organizations/$id': typeof AuthenticatedAdminOrganizationsIdRoute
   '/_authenticated/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
   '/_authenticated/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/_authenticated/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
@@ -171,13 +211,17 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/dashboard'
+    | '/delegations'
     | '/my-events'
     | '/my-registrations'
     | '/profile'
     | '/events/$slug'
     | '/events/'
+    | '/admin/delegations'
+    | '/admin/organizations'
     | '/admin/users'
     | '/events/new'
+    | '/admin/organizations/$id'
     | '/events/$id/manage'
     | '/events/$id/registrations'
     | '/events/$slug/register'
@@ -188,13 +232,17 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/dashboard'
+    | '/delegations'
     | '/my-events'
     | '/my-registrations'
     | '/profile'
     | '/events/$slug'
     | '/events'
+    | '/admin/delegations'
+    | '/admin/organizations'
     | '/admin/users'
     | '/events/new'
+    | '/admin/organizations/$id'
     | '/events/$id/manage'
     | '/events/$id/registrations'
     | '/events/$slug/register'
@@ -206,13 +254,17 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/_authenticated/dashboard'
+    | '/_authenticated/delegations'
     | '/_authenticated/my-events'
     | '/_authenticated/my-registrations'
     | '/_authenticated/profile'
     | '/events/$slug'
     | '/events/'
+    | '/_authenticated/admin/delegations'
+    | '/_authenticated/admin/organizations'
     | '/_authenticated/admin/users'
     | '/_authenticated/events/new'
+    | '/_authenticated/admin/organizations/$id'
     | '/_authenticated/events/$id/manage'
     | '/_authenticated/events/$id/registrations'
     | '/_authenticated/events/$slug/register'
@@ -300,6 +352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyEventsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/delegations': {
+      id: '/_authenticated/delegations'
+      path: '/delegations'
+      fullPath: '/delegations'
+      preLoaderRoute: typeof AuthenticatedDelegationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -319,6 +378,20 @@ declare module '@tanstack/react-router' {
       path: '/admin/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/organizations': {
+      id: '/_authenticated/admin/organizations'
+      path: '/admin/organizations'
+      fullPath: '/admin/organizations'
+      preLoaderRoute: typeof AuthenticatedAdminOrganizationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/delegations': {
+      id: '/_authenticated/admin/delegations'
+      path: '/admin/delegations'
+      fullPath: '/admin/delegations'
+      preLoaderRoute: typeof AuthenticatedAdminDelegationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/events/$slug/register': {
@@ -342,14 +415,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsIdManageRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/organizations/$id': {
+      id: '/_authenticated/admin/organizations/$id'
+      path: '/$id'
+      fullPath: '/admin/organizations/$id'
+      preLoaderRoute: typeof AuthenticatedAdminOrganizationsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminOrganizationsRoute
+    }
   }
 }
 
+interface AuthenticatedAdminOrganizationsRouteChildren {
+  AuthenticatedAdminOrganizationsIdRoute: typeof AuthenticatedAdminOrganizationsIdRoute
+}
+
+const AuthenticatedAdminOrganizationsRouteChildren: AuthenticatedAdminOrganizationsRouteChildren =
+  {
+    AuthenticatedAdminOrganizationsIdRoute:
+      AuthenticatedAdminOrganizationsIdRoute,
+  }
+
+const AuthenticatedAdminOrganizationsRouteWithChildren =
+  AuthenticatedAdminOrganizationsRoute._addFileChildren(
+    AuthenticatedAdminOrganizationsRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDelegationsRoute: typeof AuthenticatedDelegationsRoute
   AuthenticatedMyEventsRoute: typeof AuthenticatedMyEventsRoute
   AuthenticatedMyRegistrationsRoute: typeof AuthenticatedMyRegistrationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedAdminDelegationsRoute: typeof AuthenticatedAdminDelegationsRoute
+  AuthenticatedAdminOrganizationsRoute: typeof AuthenticatedAdminOrganizationsRouteWithChildren
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute
   AuthenticatedEventsIdManageRoute: typeof AuthenticatedEventsIdManageRoute
@@ -359,9 +457,13 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDelegationsRoute: AuthenticatedDelegationsRoute,
   AuthenticatedMyEventsRoute: AuthenticatedMyEventsRoute,
   AuthenticatedMyRegistrationsRoute: AuthenticatedMyRegistrationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedAdminDelegationsRoute: AuthenticatedAdminDelegationsRoute,
+  AuthenticatedAdminOrganizationsRoute:
+    AuthenticatedAdminOrganizationsRouteWithChildren,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
   AuthenticatedEventsIdManageRoute: AuthenticatedEventsIdManageRoute,

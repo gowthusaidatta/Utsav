@@ -15,12 +15,30 @@ const searchSchema = z.object({
   next: z.string().optional(),
 });
 
+function sanitizeNext(next: string | undefined): string {
+  if (!next || typeof next !== "string") return "/dashboard";
+  try {
+    // Same-origin absolute URL → keep only its path+search+hash.
+    if (next.startsWith("http")) {
+      const u = new URL(next);
+      if (typeof window !== "undefined" && u.origin !== window.location.origin)
+        return "/dashboard";
+      return u.pathname + u.search + u.hash || "/dashboard";
+    }
+    // Path-only redirect: must start with a single "/" (block "//evil.com").
+    if (!next.startsWith("/") || next.startsWith("//")) return "/dashboard";
+    return next;
+  } catch {
+    return "/dashboard";
+  }
+}
+
 export const Route = createFileRoute("/auth")({
   validateSearch: (s) => searchSchema.parse(s),
   beforeLoad: async ({ search }) => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: (search.next as "/dashboard") ?? "/dashboard" });
+    if (data.session) throw redirect({ href: sanitizeNext(search.next) });
   },
   component: AuthPage,
 });
@@ -51,7 +69,7 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: (next as "/dashboard") ?? "/dashboard" });
+    window.location.href = sanitizeNext(next);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -64,7 +82,7 @@ function AuthPage() {
     setBusy(true);
     try {
       if (isSignup) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
@@ -73,7 +91,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created. Check your email if confirmation is required.");
+        // If email confirmation is required, no session is returned — stay on /auth.
+        if (!data.session) {
+          toast.success("Account created. Check your email to confirm and sign in.");
+          setBusy(false);
+          return;
+        }
+        toast.success("Account created.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: parsed.data.email,
@@ -81,7 +105,7 @@ function AuthPage() {
         });
         if (error) throw error;
       }
-      navigate({ to: (next as "/dashboard") ?? "/dashboard" });
+      navigate({ href: sanitizeNext(next) });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Authentication failed");
     } finally {

@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 
 const ROLES = ["student", "volunteer", "organizer", "coordinator", "judge", "faculty", "admin"] as const;
@@ -42,7 +43,12 @@ function AdminUsersPage() {
   const revokeFn = useServerFn(revokeRole);
   const auditFn = useServerFn(getMyAuditLog);
   const qc = useQueryClient();
-  const users = useQuery({ queryKey: ["admin-users"], queryFn: () => listFn() });
+  const [search, setSearch] = useState("");
+  const [committed, setCommitted] = useState("");
+  const users = useQuery({
+    queryKey: ["admin-users", committed],
+    queryFn: () => listFn({ data: committed ? { search: committed } : {} }),
+  });
   const audit = useQuery({ queryKey: ["my-audit"], queryFn: () => auditFn() });
 
   const [pending, setPending] = useState<Record<string, (typeof ROLES)[number]>>({});
@@ -93,7 +99,37 @@ function AdminUsersPage() {
         <CardHeader>
           <CardTitle>Users</CardTitle>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
+        <CardContent className="space-y-3 overflow-x-auto">
+          <form
+            className="flex gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setCommitted(search.trim());
+            }}
+          >
+            <Input
+              placeholder="Search by name or email"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="max-w-sm"
+            />
+            <Button type="submit" size="sm" variant="outline">
+              Search
+            </Button>
+            {committed && (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setSearch("");
+                  setCommitted("");
+                }}
+              >
+                Clear
+              </Button>
+            )}
+          </form>
           <Table>
             <TableHeader>
               <TableRow>

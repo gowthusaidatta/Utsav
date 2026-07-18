@@ -97,3 +97,21 @@ Events, Registrations, Teams, Submissions, Judging, Attendance, QR, Certificates
 ## After this phase
 
 Next phase (Events + Registrations MVP) can be built entirely on top of `can()`, `requirePermission`, and `audit_logs` without changing any foundation code. Certificates, QR check-in, submissions, judging each become one migration + one server-fn module + one route.
+
+---
+
+## Phase 1 audit — SHIPPED (2026-07-18)
+
+Audit results and fixes captured in `docs/AUDIT_PHASE1.md`.
+
+### Delivered
+- Organizations module: `src/lib/orgs.functions.ts` + `/admin/organizations` and `/admin/organizations/$id` (CRUD + members + audit).
+- Delegation module: `revokeDelegation`, `listMyDelegations`, `listAllDelegations` server fns + `/admin/delegations` and `/delegations` routes.
+- RBAC hardening: `getMyRoles` and `listUsersWithRoles` filter expired roles; admin search added; duplicate-grant errors surfaced as clean messages.
+- Auth: `sanitizeNext` open-redirect guard; sign-up flow handles email-confirmation state; reset-password uses router `navigate`.
+- Header: shows full name with real initials; new Delegations entry.
+- Audit logging: every org / role / delegation mutation writes IP + user-agent.
+- Rebrand cleanup: plan doc references "EventGo" retained as historical; all runtime titles use "Utsav".
+
+### Next: Phase 2 — Events module audit & completion
+Deferred to next turn to keep changesets reviewable.

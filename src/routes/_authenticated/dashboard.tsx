@@ -82,9 +82,15 @@ function Dashboard() {
           <CardHeader>
             <CardTitle className="text-base">Admin</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <Link to="/admin/users">Manage users & roles</Link>
+          <CardContent className="flex flex-wrap gap-2">
+            <Button asChild size="sm">
+              <Link to="/admin/users">Users & roles</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/admin/organizations">Organizations</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/admin/delegations">Delegations</Link>
             </Button>
           </CardContent>
         </Card>
