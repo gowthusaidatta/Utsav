@@ -4,7 +4,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const uuid = z.string().uuid();
-const orgTypes = ["college", "department", "club", "company", "external"] as const;
+const orgTypes = ["college", "department", "club", "external"] as const;
 
 const slugify = (s: string) =>
   s
@@ -30,10 +30,8 @@ function requestMeta() {
   }
 }
 
-async function assertAdminOrFaculty(context: {
-  supabase: ReturnType<typeof requireSupabaseAuth> extends never ? never : any;
-  userId: string;
-}) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertAdminOrFaculty(context: any) {
   const { data: isAdmin } = await context.supabase.rpc("has_global_role", {
     _uid: context.userId,
     _role: "admin",
@@ -166,7 +164,12 @@ export const updateOrganization = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdminOrFaculty(context);
-    const patch: Record<string, unknown> = {};
+    const patch: {
+      name?: string;
+      slug?: string;
+      type?: (typeof orgTypes)[number];
+      parent_org_id?: string | null;
+    } = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.slug !== undefined) patch.slug = slugify(data.slug);
     if (data.type !== undefined) patch.type = data.type;
@@ -185,7 +188,7 @@ export const updateOrganization = createServerFn({ method: "POST" })
       action: "organization.updated",
       resource_type: "organizations",
       resource_id: data.id,
-      metadata: patch,
+      metadata: patch as Record<string, string | null>,
       ip: meta.ip,
       user_agent: meta.user_agent,
     });
