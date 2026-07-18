@@ -31,12 +31,29 @@ function Dashboard() {
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Welcome{profile.data?.full_name ? `, ${profile.data.full_name}` : ""}
-        </h1>
-        <p className="text-sm text-muted-foreground">Your Utsav dashboard.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Welcome{profile.data?.full_name ? `, ${profile.data.full_name}` : ""}
+          </h1>
+          <p className="text-sm text-muted-foreground">Your Utsav dashboard.</p>
+        </div>
+        <div className="flex gap-2">
+          {canCreateEvent && (
+            <Button asChild>
+              <Link to="/events/new">
+                <Plus className="mr-2 h-4 w-4" /> New event
+              </Link>
+            </Button>
+          )}
+          <Button asChild variant="outline">
+            <Link to="/my-events">
+              <CalendarDays className="mr-2 h-4 w-4" /> My events
+            </Link>
+          </Button>
+        </div>
       </div>
+
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
