@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShieldCheck, User } from "lucide-react";
+import { ShieldCheck, User, Plus, CalendarDays } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Utsav" }] }),
