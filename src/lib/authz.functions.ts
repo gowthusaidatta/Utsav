@@ -32,7 +32,7 @@ export const checkPermission = createServerFn({ method: "POST" })
     const { data: result, error } = await context.supabase.rpc("can", {
       _uid: context.userId,
       _action: data.action,
-      _event: data.eventId ?? null,
+      _event: data.eventId ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { allowed: !!result };
