@@ -64,6 +64,12 @@ export function Header() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/dashboard" })}>
                   <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/my-events" })}>
+                  <CalendarDays className="mr-2 h-4 w-4" /> My events
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/events/new" })}>
+                  <Plus className="mr-2 h-4 w-4" /> New event
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate({ to: "/my-registrations" })}>
                   <Ticket className="mr-2 h-4 w-4" /> My registrations
                 </DropdownMenuItem>
