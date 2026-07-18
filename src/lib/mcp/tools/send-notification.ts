@@ -55,7 +55,7 @@ export default defineTool({
       else results.push({ id: res.id, recipient: rid, status: res.status });
     }
 
-    await recordAudit(supabase, actor, "notification.send", input.event_id ? "event" : "user", input.event_id ?? null, {
+    await recordAudit(supabase, actor, "notification.send", input.event_id ? "event" : "user", input.event_id ?? undefined, {
       channel: input.channel, sent: results.length, failed: errors.length, template_key: input.template_key,
     });
     return ok({ sent_count: results.length, failed_count: errors.length, results, errors });
