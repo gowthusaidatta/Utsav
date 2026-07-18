@@ -120,6 +120,9 @@ function Dashboard() {
                 <Button asChild size="sm" variant="outline">
                   <Link to="/admin/delegations">Delegations</Link>
                 </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/admin/role-matrix">Role matrix</Link>
+                </Button>
               </>
             )}
             <Button asChild size="sm" variant="outline">
