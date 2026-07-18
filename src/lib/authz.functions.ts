@@ -210,6 +210,21 @@ export const revokeRole = createServerFn({ method: "POST" })
       .eq("id", data.roleId)
       .maybeSingle();
 
+    // Prevent lockout: block revoking the last global admin (incl. self).
+    if (row?.role === "admin" && row?.scope === "global") {
+      const { count } = await supabaseAdmin
+        .from("user_roles")
+        .select("id", { count: "exact", head: true })
+        .eq("role", "admin")
+        .eq("scope", "global");
+      if ((count ?? 0) <= 1) {
+        throw new Error("Cannot revoke the last global admin role");
+      }
+      if (row.user_id === context.userId) {
+        throw new Error("You cannot revoke your own admin role. Ask another admin.");
+      }
+    }
+
     const { error } = await supabaseAdmin.from("user_roles").delete().eq("id", data.roleId);
     if (error) throw new Error(error.message);
 
