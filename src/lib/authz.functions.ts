@@ -658,7 +658,7 @@ export const listAllDelegations = createServerFn({ method: "GET" })
     const { data, error } = await supabaseAdmin
       .from("permission_delegations")
       .select(
-        "id, delegator_user_id, delegate_user_id, role, scope, scope_id, expires_at, revoked_at, created_at",
+        "id, delegator_user_id, delegate_user_id, role, scope, scope_id, granted_at, expires_at, revoked_at",
       )
       .order("created_at", { ascending: false })
       .limit(500);
@@ -672,7 +672,7 @@ export const listMyDelegations = createServerFn({ method: "GET" })
     const { data: incoming, error: iErr } = await context.supabase
       .from("permission_delegations")
       .select(
-        "id, delegator_user_id, delegate_user_id, role, scope, scope_id, expires_at, revoked_at, created_at",
+        "id, delegator_user_id, delegate_user_id, role, scope, scope_id, granted_at, expires_at, revoked_at",
       )
       .eq("delegate_user_id", context.userId)
       .order("created_at", { ascending: false });
@@ -681,7 +681,7 @@ export const listMyDelegations = createServerFn({ method: "GET" })
     const { data: outgoing, error: oErr } = await context.supabase
       .from("permission_delegations")
       .select(
-        "id, delegator_user_id, delegate_user_id, role, scope, scope_id, expires_at, revoked_at, created_at",
+        "id, delegator_user_id, delegate_user_id, role, scope, scope_id, granted_at, expires_at, revoked_at",
       )
       .eq("delegator_user_id", context.userId)
       .order("created_at", { ascending: false });
