@@ -47,16 +47,22 @@ function AdminUsersPage() {
   const assignFn = useServerFn(assignRole);
   const revokeFn = useServerFn(revokeRole);
   const auditFn = useServerFn(getMyAuditLog);
+  const meFn = useServerFn(getActorContext);
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [committed, setCommitted] = useState("");
+  const me = useQuery({ queryKey: ["actor-ctx"], queryFn: () => meFn() });
+  const actorRank = me.data?.rank ?? 0;
+  const assignable = (Object.keys(ROLE_RANK) as AppRole[])
+    .filter((r) => ROLE_RANK[r] < actorRank && r !== "admin")
+    .sort((a, b) => ROLE_RANK[b] - ROLE_RANK[a]);
   const users = useQuery({
     queryKey: ["admin-users", committed],
     queryFn: () => listFn({ data: committed ? { search: committed } : {} }),
   });
   const audit = useQuery({ queryKey: ["my-audit"], queryFn: () => auditFn() });
 
-  const [pending, setPending] = useState<Record<string, (typeof ROLES)[number]>>({});
+  const [pending, setPending] = useState<Record<string, AppRole>>({});
 
   const assign = useMutation({
     mutationFn: (v: { userId: string; role: (typeof ROLES)[number] }) =>
