@@ -192,7 +192,7 @@ function AdminUsersPage() {
                         <SelectContent>
                           {ROLES.map((r) => (
                             <SelectItem key={r} value={r}>
-                              {r}
+                              {ROLE_LABELS[r]}
                             </SelectItem>
                           ))}
                         </SelectContent>
