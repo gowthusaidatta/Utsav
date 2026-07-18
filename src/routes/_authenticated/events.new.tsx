@@ -154,7 +154,7 @@ function NewEvent() {
               <Button type="submit" disabled={busy}>
                 {busy ? "Creating…" : "Create draft"}
               </Button>
-              <Button type="button" variant="ghost" onClick={() => router.history.back()}>
+              <Button type="button" variant="ghost" onClick={() => router.navigate({ to: "/my-events" })}>
                 Cancel
               </Button>
             </div>
