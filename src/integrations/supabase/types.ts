@@ -50,6 +50,98 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          capacity: number | null
+          category: string | null
+          cover_image_url: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          description: string | null
+          end_at: string | null
+          id: string
+          is_online: boolean
+          is_paid: boolean
+          meeting_url: string | null
+          organization_id: string | null
+          price: number
+          published_at: string | null
+          registration_deadline: string | null
+          slug: string
+          start_at: string | null
+          status: Database["public"]["Enums"]["event_status"]
+          tags: string[]
+          timezone: string
+          title: string
+          updated_at: string
+          venue: string | null
+          visibility: Database["public"]["Enums"]["event_visibility"]
+        }
+        Insert: {
+          capacity?: number | null
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by: string
+          currency?: string
+          description?: string | null
+          end_at?: string | null
+          id?: string
+          is_online?: boolean
+          is_paid?: boolean
+          meeting_url?: string | null
+          organization_id?: string | null
+          price?: number
+          published_at?: string | null
+          registration_deadline?: string | null
+          slug: string
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["event_status"]
+          tags?: string[]
+          timezone?: string
+          title: string
+          updated_at?: string
+          venue?: string | null
+          visibility?: Database["public"]["Enums"]["event_visibility"]
+        }
+        Update: {
+          capacity?: number | null
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string | null
+          end_at?: string | null
+          id?: string
+          is_online?: boolean
+          is_paid?: boolean
+          meeting_url?: string | null
+          organization_id?: string | null
+          price?: number
+          published_at?: string | null
+          registration_deadline?: string | null
+          slug?: string
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["event_status"]
+          tags?: string[]
+          timezone?: string
+          title?: string
+          updated_at?: string
+          venue?: string | null
+          visibility?: Database["public"]["Enums"]["event_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_members: {
         Row: {
           joined_at: string
@@ -264,6 +356,14 @@ export type Database = {
         | "judge"
         | "faculty"
         | "admin"
+      event_status:
+        | "draft"
+        | "pending_approval"
+        | "published"
+        | "cancelled"
+        | "completed"
+        | "archived"
+      event_visibility: "public" | "private" | "invite_only"
       org_type: "college" | "department" | "club" | "external"
       role_scope: "global" | "organization" | "event"
     }
@@ -402,6 +502,15 @@ export const Constants = {
         "faculty",
         "admin",
       ],
+      event_status: [
+        "draft",
+        "pending_approval",
+        "published",
+        "cancelled",
+        "completed",
+        "archived",
+      ],
+      event_visibility: ["public", "private", "invite_only"],
       org_type: ["college", "department", "club", "external"],
       role_scope: ["global", "organization", "event"],
     },
