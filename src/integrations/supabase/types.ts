@@ -699,6 +699,7 @@ export type Database = {
         Args: { _action: string; _event?: string; _uid: string }
         Returns: boolean
       }
+      can_create_event: { Args: { _uid: string }; Returns: boolean }
       has_global_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"]; _uid: string }
         Returns: boolean

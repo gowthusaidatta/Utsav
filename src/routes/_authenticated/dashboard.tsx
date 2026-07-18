@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShieldCheck, User } from "lucide-react";
+import { ShieldCheck, User, Plus, CalendarDays } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Utsav" }] }),
@@ -20,17 +20,40 @@ function Dashboard() {
   const roles = useQuery({ queryKey: ["my-roles"], queryFn: () => rolesFn() });
   const profile = useQuery({ queryKey: ["my-profile"], queryFn: () => profileFn() });
   const router = useRouter();
-  const isAdmin = (roles.data ?? []).some((r) => r.role === "admin" && r.scope === "global");
-  const isFaculty = (roles.data ?? []).some((r) => r.role === "faculty" && r.scope === "global");
+  const activeRoles = (roles.data ?? []).filter(
+    (r) => !r.expires_at || new Date(r.expires_at) > new Date(),
+  );
+  const isAdmin = activeRoles.some((r) => r.role === "admin" && r.scope === "global");
+  const isFaculty = activeRoles.some((r) => r.role === "faculty" && r.scope === "global");
+  const canCreateEvent = activeRoles.some((r) =>
+    ["admin", "faculty", "organizer", "coordinator"].includes(r.role),
+  );
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Welcome{profile.data?.full_name ? `, ${profile.data.full_name}` : ""}
-        </h1>
-        <p className="text-sm text-muted-foreground">Your Utsav dashboard.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Welcome{profile.data?.full_name ? `, ${profile.data.full_name}` : ""}
+          </h1>
+          <p className="text-sm text-muted-foreground">Your Utsav dashboard.</p>
+        </div>
+        <div className="flex gap-2">
+          {canCreateEvent && (
+            <Button asChild>
+              <Link to="/events/new">
+                <Plus className="mr-2 h-4 w-4" /> New event
+              </Link>
+            </Button>
+          )}
+          <Button asChild variant="outline">
+            <Link to="/my-events">
+              <CalendarDays className="mr-2 h-4 w-4" /> My events
+            </Link>
+          </Button>
+        </div>
       </div>
+
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>

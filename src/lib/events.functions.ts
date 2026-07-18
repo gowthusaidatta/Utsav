@@ -219,6 +219,16 @@ export const createEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => upsertSchema.parse(input))
   .handler(async ({ data, context }) => {
+    // RBAC: only admin/faculty/organizer/coordinator (or delegated) can create events.
+    const { data: allowed, error: permErr } = await context.supabase.rpc("can", {
+      _uid: context.userId,
+      _action: "create_event",
+    });
+    if (permErr) throw new Error(permErr.message);
+    if (!allowed)
+      throw new Error(
+        "Forbidden: your role does not permit creating events. Ask an admin for an organizer or coordinator role.",
+      );
     // New events are always drafts — status/visibility come from lifecycle actions.
     const base = slugify(data.title) || "event";
     let slug = base;

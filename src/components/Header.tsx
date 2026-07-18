@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket } from "lucide-react";
+import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket, Plus } from "lucide-react";
 
 export function Header() {
   const { user, loading } = useSession();
@@ -63,6 +63,12 @@ export function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate({ to: "/dashboard" })}>
                   <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/my-events" })}>
+                  <CalendarDays className="mr-2 h-4 w-4" /> My events
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/events/new" })}>
+                  <Plus className="mr-2 h-4 w-4" /> New event
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate({ to: "/my-registrations" })}>
                   <Ticket className="mr-2 h-4 w-4" /> My registrations
