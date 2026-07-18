@@ -157,13 +157,38 @@ Error:
 | `permission_history` | self or admin | Role/delegation events for a user. |
 | `event_history` | RLS-scoped | Audit trail for one event. |
 
-### Roadmap (registered, return `NOT_IMPLEMENTED`)
-These tools are advertised for client discovery. Handlers return a
-`NOT_IMPLEMENTED` error that names the phase in which they ship.
+### Media (5)
+| Tool | RBAC | Description |
+|------|------|-------------|
+| `upload_image` | any signed-in user | Base64 PNG/JPEG/WEBP/GIF up to 10 MB; SHA256 + magic-byte + malware scan; returns signed URL. |
+| `upload_video` | any signed-in user | MP4/WEBM/QuickTime up to 200 MB; same scan pipeline. |
+| `upload_document` | any signed-in user | PDF / Word / Excel / plain text up to 25 MB. |
+| `delete_media` | uploader, event staff, or admin | Removes DB row and storage object. |
+| `list_media` | RLS-scoped | List assets by event / uploader / kind with signed URLs. |
 
-- **Phase 4 — Media**: `upload_image`, `upload_video`, `upload_document`, `delete_media`, `list_media`.
-- **Phase 6 — Reports**: `export_excel`, `export_csv`, `export_pdf`.
-- **Phase 7 — Certificates & Notifications**: `generate_certificate`, `verify_certificate`, `download_certificate`, `send_notification`, `schedule_notification`, `notification_history`.
+### Import / Export (3)
+| Tool | RBAC | Description |
+|------|------|-------------|
+| `export_csv` | RLS-scoped | Inline CSV for users/orgs/events/registrations/attendance/teams/analytics. |
+| `export_excel` | RLS-scoped | Styled XLSX uploaded to the private `exports` bucket; returns signed URL. |
+| `export_pdf` | RLS-scoped | Landscape PDF report; returns signed URL. |
+
+### Certificates (3)
+| Tool | RBAC | Description |
+|------|------|-------------|
+| `generate_certificate` | coordinator / faculty / admin (`issue_certificates`) | Batch-issues HMAC-signed PDF certificates with embedded verification QR. |
+| `verify_certificate` | public (via tool) or web `/verify/:code` | Validates code + signature, returns issuance metadata. |
+| `download_certificate` | recipient or event staff | Signed URL to the certificate PDF. |
+
+Public verification page: `/verify/:code` (no login required).
+
+### Notifications (3)
+| Tool | RBAC | Description |
+|------|------|-------------|
+| `send_notification` | coordinator / faculty / admin | Fan-out in-app / email notifications to users or event registrants, optional template + variables. |
+| `schedule_notification` | coordinator / faculty / admin | Queue future delivery (send_at). |
+| `notification_history` | self or admin | Filter by recipient / event / status. |
+
 
 ## Usage examples
 
