@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Trash2 } from "lucide-react";
 
-const ORG_TYPES = ["college", "department", "club", "company", "external"] as const;
+const ORG_TYPES = ["college", "department", "club", "external"] as const;
 
 export const Route = createFileRoute("/_authenticated/admin/organizations/$id")({
   head: () => ({ meta: [{ title: "Organization — Utsav" }] }),
@@ -212,9 +212,7 @@ function OrgDetailPage() {
 
           <ul className="divide-y">
             {(org.data?.members ?? []).map((m) => {
-              const u = m.user as
-                | { id: string; full_name: string | null; email: string }
-                | null;
+              const u = m.user;
               return (
                 <li key={m.user_id} className="flex items-center justify-between py-2">
                   <div>

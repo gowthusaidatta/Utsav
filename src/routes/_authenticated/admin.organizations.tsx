@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const ORG_TYPES = ["college", "department", "club", "company", "external"] as const;
+const ORG_TYPES = ["college", "department", "club", "external"] as const;
 
 export const Route = createFileRoute("/_authenticated/admin/organizations")({
   head: () => ({ meta: [{ title: "Admin · Organizations — Utsav" }] }),
