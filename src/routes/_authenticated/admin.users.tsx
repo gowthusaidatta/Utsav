@@ -30,7 +30,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 
-const ROLES = ["student", "volunteer", "organizer", "coordinator", "judge", "faculty", "admin"] as const;
+import { APP_ROLES, ROLE_LABELS } from "@/lib/rbac-matrix";
+const ROLES = APP_ROLES;
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   head: () => ({ meta: [{ title: "Admin · Users — Utsav" }] }),
