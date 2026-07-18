@@ -79,25 +79,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EventGo — Enterprise Event Management Platform" },
+      { title: "Utsav — Modern Event Management Platform" },
       {
         name: "description",
         content:
-          "EventGo is an enterprise-grade event management platform for hackathons, conferences, and college fests. Manage registrations, teams, judging, certificates, and analytics at scale.",
+          "Utsav is a modern event management platform for hackathons, conferences, and campus fests. Registrations, teams, judging, certificates, and analytics at scale.",
       },
-      { name: "author", content: "EventGo" },
-      { property: "og:title", content: "EventGo — Enterprise Event Management Platform" },
+      { name: "author", content: "Utsav" },
+      { property: "og:title", content: "Utsav — Modern Event Management Platform" },
       {
         property: "og:description",
         content:
           "Run hackathons, conferences, and campus events end-to-end with role-based access, teams, judging, and analytics.",
       },
+      { property: "og:site_name", content: "Utsav" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,

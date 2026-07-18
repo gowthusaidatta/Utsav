@@ -32,7 +32,7 @@ import { X } from "lucide-react";
 const ROLES = ["student", "volunteer", "organizer", "coordinator", "judge", "faculty", "admin"] as const;
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
-  head: () => ({ meta: [{ title: "Admin · Users — EventGo" }] }),
+  head: () => ({ meta: [{ title: "Admin · Users — Utsav" }] }),
   component: AdminUsersPage,
 });
 
