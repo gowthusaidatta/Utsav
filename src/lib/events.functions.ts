@@ -231,8 +231,8 @@ export const updateEvent = createServerFn({ method: "POST" })
       ...(patch.status === "published" ? { published_at: new Date().toISOString() } : {}),
     };
 
-    const { error } = await context.supabase.from("events").update(update).eq("id", id);
-    if (error) throw new Error(error.message);
+    const { error } = await context.supabase.from("events").update(update as never).eq("id", id);
+    if (error) throw new Error((error as { message: string }).message);
     if (error) throw new Error(error.message);
 
     await context.supabase.from("audit_logs").insert({
