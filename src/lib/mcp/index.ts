@@ -72,13 +72,28 @@ import auditLogsTool from "./tools/audit-logs";
 import permissionHistoryTool from "./tools/permission-history";
 import eventHistoryTool from "./tools/event-history";
 
-// Roadmap tools (register but return structured NOT_IMPLEMENTED until their phase ships)
-import {
-  uploadImage, uploadVideo, uploadDocument, deleteMedia, listMedia,
-  exportExcel, exportCsv, exportPdf,
-  generateCertificate, verifyCertificate, downloadCertificate,
-  sendNotification, scheduleNotification, notificationHistory,
-} from "./tools/pending-phases";
+// Media (Phase 4)
+import uploadImageTool from "./tools/upload-image";
+import uploadVideoTool from "./tools/upload-video";
+import uploadDocumentTool from "./tools/upload-document";
+import deleteMediaTool from "./tools/delete-media";
+import listMediaTool from "./tools/list-media";
+
+// Import/Export (Phase 6)
+import exportCsvTool from "./tools/export-csv";
+import exportExcelTool from "./tools/export-excel";
+import exportPdfTool from "./tools/export-pdf";
+
+// Certificates (Phase 7)
+import generateCertificateTool from "./tools/generate-certificate";
+import verifyCertificateTool from "./tools/verify-certificate";
+import downloadCertificateTool from "./tools/download-certificate";
+
+// Notifications (Phase 7)
+import sendNotificationTool from "./tools/send-notification";
+import scheduleNotificationTool from "./tools/schedule-notification";
+import notificationHistoryTool from "./tools/notification-history";
+
 
 // The OAuth issuer MUST be the direct Supabase host — the .lovable.cloud proxy
 // publishes the direct supabase.co issuer in its discovery document and mcp-js
