@@ -21,6 +21,7 @@ import { Route as AuthenticatedMyEventsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authenticated/events.new'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedEventsSlugRegisterRouteImport } from './routes/_authenticated/events.$slug.register'
 import { Route as AuthenticatedEventsIdManageRouteImport } from './routes/_authenticated/events.$id.manage'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -82,6 +83,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEventsSlugRegisterRoute =
+  AuthenticatedEventsSlugRegisterRouteImport.update({
+    id: '/events/$slug/register',
+    path: '/events/$slug/register',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEventsIdManageRoute =
   AuthenticatedEventsIdManageRouteImport.update({
     id: '/events/$id/manage',
@@ -102,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
+  '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -116,6 +124,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
+  '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -132,6 +141,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/events/new': typeof AuthenticatedEventsNewRoute
   '/_authenticated/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
+  '/_authenticated/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/events/new'
     | '/events/$id/manage'
+    | '/events/$slug/register'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/events/new'
     | '/events/$id/manage'
+    | '/events/$slug/register'
   id:
     | '__root__'
     | '/'
@@ -177,6 +189,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/_authenticated/events/new'
     | '/_authenticated/events/$id/manage'
+    | '/_authenticated/events/$slug/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -275,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events/$slug/register': {
+      id: '/_authenticated/events/$slug/register'
+      path: '/events/$slug/register'
+      fullPath: '/events/$slug/register'
+      preLoaderRoute: typeof AuthenticatedEventsSlugRegisterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/events/$id/manage': {
       id: '/_authenticated/events/$id/manage'
       path: '/events/$id/manage'
@@ -292,6 +312,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute
   AuthenticatedEventsIdManageRoute: typeof AuthenticatedEventsIdManageRoute
+  AuthenticatedEventsSlugRegisterRoute: typeof AuthenticatedEventsSlugRegisterRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -301,6 +322,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
   AuthenticatedEventsIdManageRoute: AuthenticatedEventsIdManageRoute,
+  AuthenticatedEventsSlugRegisterRoute: AuthenticatedEventsSlugRegisterRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
