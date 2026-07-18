@@ -23,6 +23,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authenticated/events.new'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedEventsSlugRegisterRouteImport } from './routes/_authenticated/events.$slug.register'
+import { Route as AuthenticatedEventsIdRegistrationsRouteImport } from './routes/_authenticated/events.$id.registrations'
 import { Route as AuthenticatedEventsIdManageRouteImport } from './routes/_authenticated/events.$id.manage'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -96,6 +97,12 @@ const AuthenticatedEventsSlugRegisterRoute =
     path: '/events/$slug/register',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEventsIdRegistrationsRoute =
+  AuthenticatedEventsIdRegistrationsRouteImport.update({
+    id: '/events/$id/registrations',
+    path: '/events/$id/registrations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEventsIdManageRoute =
   AuthenticatedEventsIdManageRouteImport.update({
     id: '/events/$id/manage',
@@ -117,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
+  '/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
 }
 export interface FileRoutesByTo {
@@ -133,6 +141,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
+  '/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
 }
 export interface FileRoutesById {
@@ -151,6 +160,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/events/new': typeof AuthenticatedEventsNewRoute
   '/_authenticated/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
+  '/_authenticated/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/_authenticated/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
 }
 export interface FileRouteTypes {
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/events/new'
     | '/events/$id/manage'
+    | '/events/$id/registrations'
     | '/events/$slug/register'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/events/new'
     | '/events/$id/manage'
+    | '/events/$id/registrations'
     | '/events/$slug/register'
   id:
     | '__root__'
@@ -202,6 +214,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/_authenticated/events/new'
     | '/_authenticated/events/$id/manage'
+    | '/_authenticated/events/$id/registrations'
     | '/_authenticated/events/$slug/register'
   fileRoutesById: FileRoutesById
 }
@@ -315,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsSlugRegisterRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events/$id/registrations': {
+      id: '/_authenticated/events/$id/registrations'
+      path: '/events/$id/registrations'
+      fullPath: '/events/$id/registrations'
+      preLoaderRoute: typeof AuthenticatedEventsIdRegistrationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/events/$id/manage': {
       id: '/_authenticated/events/$id/manage'
       path: '/events/$id/manage'
@@ -333,6 +353,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute
   AuthenticatedEventsIdManageRoute: typeof AuthenticatedEventsIdManageRoute
+  AuthenticatedEventsIdRegistrationsRoute: typeof AuthenticatedEventsIdRegistrationsRoute
   AuthenticatedEventsSlugRegisterRoute: typeof AuthenticatedEventsSlugRegisterRoute
 }
 
@@ -344,6 +365,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
   AuthenticatedEventsIdManageRoute: AuthenticatedEventsIdManageRoute,
+  AuthenticatedEventsIdRegistrationsRoute:
+    AuthenticatedEventsIdRegistrationsRoute,
   AuthenticatedEventsSlugRegisterRoute: AuthenticatedEventsSlugRegisterRoute,
 }
 
