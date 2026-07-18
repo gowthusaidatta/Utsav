@@ -386,3 +386,63 @@ export const getMyAuditLog = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
+// -----------------------------------------------------------
+// verifyMyPermissions — batch-checks every action in the matrix
+// against public.can() for the signed-in user. Powers the
+// /admin/role-matrix verification page. Optional _event id lets you
+// probe event-scoped actions as if the caller were staffing it.
+// -----------------------------------------------------------
+const ACTIONS_TO_PROBE = [
+  "view_event",
+  "register",
+  "create_team",
+  "submit_project",
+  "create_event",
+  "edit_event",
+  "publish_event",
+  "manage_teams",
+  "approve_registration",
+  "score_submissions",
+  "check_in",
+  "issue_certificates",
+  "delete_event",
+  "manage_users",
+  "manage_organizations",
+  "view_finance",
+  "manage_media",
+  "mentor_teams",
+  "sponsor_view",
+  "view_audit_logs",
+] as const;
+
+export const verifyMyPermissions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ event_id: z.string().uuid().nullable().optional() }).parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const uid = context.userId;
+    const results: Record<string, boolean> = {};
+    for (const action of ACTIONS_TO_PROBE) {
+      const { data: allowed, error } = await context.supabase.rpc("can", {
+        _uid: uid,
+        _action: action,
+        _event: data.event_id ?? null,
+      });
+      if (error) throw new Error(`can(${action}): ${error.message}`);
+      results[action] = Boolean(allowed);
+    }
+    const [{ data: roles }, { data: delegations }] = await Promise.all([
+      context.supabase
+        .from("user_roles")
+        .select("role, scope, scope_id, expires_at")
+        .eq("user_id", uid),
+      context.supabase
+        .from("permission_delegations")
+        .select("role, scope, scope_id, expires_at, revoked_at")
+        .eq("delegate_user_id", uid)
+        .is("revoked_at", null),
+    ]);
+    return { user_id: uid, actions: results, roles: roles ?? [], delegations: delegations ?? [] };
+  });
