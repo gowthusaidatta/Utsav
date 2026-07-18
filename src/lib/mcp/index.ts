@@ -138,10 +138,14 @@ export default defineMcp({
     globalSearchTool,
     // Audit
     auditLogsTool, permissionHistoryTool, eventHistoryTool,
-    // Roadmap (structured NOT_IMPLEMENTED)
-    uploadImage, uploadVideo, uploadDocument, deleteMedia, listMedia,
-    exportExcel, exportCsv, exportPdf,
-    generateCertificate, verifyCertificate, downloadCertificate,
-    sendNotification, scheduleNotification, notificationHistory,
+    // Media
+    uploadImageTool, uploadVideoTool, uploadDocumentTool, deleteMediaTool, listMediaTool,
+    // Import/Export
+    exportCsvTool, exportExcelTool, exportPdfTool,
+    // Certificates
+    generateCertificateTool, verifyCertificateTool, downloadCertificateTool,
+    // Notifications
+    sendNotificationTool, scheduleNotificationTool, notificationHistoryTool,
+
   ],
 });

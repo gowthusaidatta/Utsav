@@ -1783,210 +1783,672 @@
       {
         "name": "upload_image",
         "title": "Upload image",
-        "description": "Upload an image (event cover, org logo, avatar). (Not yet available — ships in Phase 4 (Media Management).)",
+        "description": "Upload an image (event cover, org logo, avatar) to the media bucket. Accepts base64-encoded data up to 10MB. Returns metadata and a signed download URL.",
         "annotations": {
-          "readOnlyHint": true,
+          "readOnlyHint": false,
+          "destructiveHint": false,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "filename": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Original filename with extension."
+            },
+            "data_base64": {
+              "type": "string",
+              "minLength": 4,
+              "description": "Base64-encoded image bytes. `data:` prefix accepted."
+            },
+            "mime_type": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Declared MIME (image/jpeg, image/png, image/webp, image/gif, image/svg+xml, image/avif)."
+            },
+            "owner_type": {
+              "type": "string",
+              "enum": [
+                "event",
+                "organization",
+                "user"
+              ]
+            },
+            "owner_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Event to scope this asset to (for RBAC)."
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          },
+          "required": [
+            "filename",
+            "data_base64",
+            "mime_type",
+            "owner_type",
+            "owner_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "upload_video",
         "title": "Upload video",
-        "description": "Upload a video asset. (Not yet available — ships in Phase 4 (Media Management).)",
+        "description": "Upload a video asset (up to 200MB, base64-encoded). Video preview URL available via signed download.",
         "annotations": {
-          "readOnlyHint": true,
+          "readOnlyHint": false,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "filename": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "data_base64": {
+              "type": "string",
+              "minLength": 4
+            },
+            "mime_type": {
+              "type": "string",
+              "description": "video/mp4, video/webm, video/quicktime, or video/x-matroska"
+            },
+            "owner_type": {
+              "type": "string",
+              "enum": [
+                "event",
+                "organization",
+                "user"
+              ]
+            },
+            "owner_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          },
+          "required": [
+            "filename",
+            "data_base64",
+            "mime_type",
+            "owner_type",
+            "owner_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "upload_document",
         "title": "Upload document",
-        "description": "Upload a document (rules, brochure, etc.). (Not yet available — ships in Phase 4 (Media Management).)",
+        "description": "Upload a document (PDF, Office, text) up to 25MB, base64-encoded. Returns metadata and signed download URL.",
         "annotations": {
-          "readOnlyHint": true,
+          "readOnlyHint": false,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "filename": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "data_base64": {
+              "type": "string",
+              "minLength": 4
+            },
+            "mime_type": {
+              "type": "string",
+              "description": "application/pdf, docx, xlsx, pptx, text/plain, text/csv, text/markdown"
+            },
+            "owner_type": {
+              "type": "string",
+              "enum": [
+                "event",
+                "organization",
+                "user"
+              ]
+            },
+            "owner_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          },
+          "required": [
+            "filename",
+            "data_base64",
+            "mime_type",
+            "owner_type",
+            "owner_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "delete_media",
         "title": "Delete media",
-        "description": "Delete a media asset by id. (Not yet available — ships in Phase 4 (Media Management).)",
+        "description": "Delete a media asset by id. Requires uploader ownership, event manager role, or admin.",
         "annotations": {
-          "readOnlyHint": true,
+          "readOnlyHint": false,
+          "destructiveHint": true,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "list_media",
         "title": "List media",
-        "description": "List media assets for an event or organization. (Not yet available — ships in Phase 4 (Media Management).)",
+        "description": "List media assets scoped to an event, organization, or user. Returns rows visible under RLS and signed URLs.",
         "annotations": {
           "readOnlyHint": true,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
-        },
-        "outputSchema": null
-      },
-      {
-        "name": "export_excel",
-        "title": "Export Excel",
-        "description": "Export registrations/attendance to XLSX. (Not yet available — ships in Phase 6 (Reports).)",
-        "annotations": {
-          "readOnlyHint": true,
-          "openWorldHint": false
-        },
-        "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
-          "type": "object",
-          "properties": {}
+          "properties": {
+            "owner_type": {
+              "type": "string",
+              "enum": [
+                "event",
+                "organization",
+                "user"
+              ]
+            },
+            "owner_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "image",
+                "video",
+                "document"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            },
+            "include_urls": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "export_csv",
         "title": "Export CSV",
-        "description": "Export registrations/attendance to CSV. (Not yet available — ships in Phase 6 (Reports).)",
+        "description": "Export a dataset (users, organizations, events, registrations, attendance, teams, certificates, analytics) as CSV. Returns inline text and a base64 payload; rows filtered by RLS.",
         "annotations": {
           "readOnlyHint": true,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "resource": {
+              "type": "string",
+              "enum": [
+                "users",
+                "organizations",
+                "events",
+                "registrations",
+                "attendance",
+                "teams",
+                "certificates",
+                "analytics"
+              ]
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "organization_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 5000
+            }
+          },
+          "required": [
+            "resource"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "export_excel",
+        "title": "Export Excel (XLSX)",
+        "description": "Export a dataset to an XLSX workbook. Uploads to the private exports bucket and returns a signed download URL (valid 1 hour).",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "resource": {
+              "type": "string",
+              "enum": [
+                "users",
+                "organizations",
+                "events",
+                "registrations",
+                "attendance",
+                "teams",
+                "certificates",
+                "analytics"
+              ]
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "organization_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 5000
+            }
+          },
+          "required": [
+            "resource"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "export_pdf",
         "title": "Export PDF report",
-        "description": "Generate a PDF summary report. (Not yet available — ships in Phase 6 (Reports).)",
+        "description": "Generate a tabular PDF report for a dataset. Uploads to the private exports bucket and returns a signed download URL.",
         "annotations": {
           "readOnlyHint": true,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "resource": {
+              "type": "string",
+              "enum": [
+                "users",
+                "organizations",
+                "events",
+                "registrations",
+                "attendance",
+                "teams",
+                "certificates",
+                "analytics"
+              ]
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "organization_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 500
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          "required": [
+            "resource"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "generate_certificate",
         "title": "Generate certificate",
-        "description": "Issue a certificate for a checked-in attendee. (Not yet available — ships in Phase 7 (Certificates).)",
+        "description": "Issue a certificate to one user or a batch. Rendered as a signed PDF with a QR verification code; row stored under RLS. Requires event organizer, coordinator, faculty, or admin.",
         "annotations": {
-          "readOnlyHint": true,
+          "readOnlyHint": false,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "user_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 1,
+              "maxItems": 500
+            },
+            "template_key": {
+              "type": "string",
+              "enum": [
+                "default",
+                "participation",
+                "winner"
+              ],
+              "default": "participation"
+            },
+            "variables": {
+              "type": "object",
+              "additionalProperties": {},
+              "description": "Additional template variables (role, position, remarks)."
+            }
+          },
+          "required": [
+            "event_id",
+            "user_ids"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "verify_certificate",
         "title": "Verify certificate",
-        "description": "Verify a certificate by its public code. (Not yet available — ships in Phase 7 (Certificates).)",
+        "description": "Verify a certificate by its public code. Returns validity, recipient, event, and issue/revocation status. Any authenticated caller may verify.",
         "annotations": {
           "readOnlyHint": true,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 6,
+              "maxLength": 64,
+              "description": "The public certificate code, e.g. UTV-ABCD-EFGHIJ."
+            }
+          },
+          "required": [
+            "code"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "download_certificate",
         "title": "Download certificate",
-        "description": "Fetch a signed certificate download URL. (Not yet available — ships in Phase 7 (Certificates).)",
+        "description": "Return a signed download URL for a certificate PDF. Recipients can download their own; organizers/coordinators/admins can download any.",
         "annotations": {
           "readOnlyHint": true,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 6,
+              "maxLength": 64
+            },
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "expires_in": {
+              "type": "integer",
+              "minimum": 60,
+              "maximum": 86400,
+              "default": 3600
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "send_notification",
         "title": "Send notification",
-        "description": "Send an immediate notification. (Not yet available — ships in Phase 7 (Notifications).)",
+        "description": "Send an immediate in-app or email notification to one or more users. Optional template with {{variables}}. Requires elevated role unless sending to self.",
         "annotations": {
-          "readOnlyHint": true,
+          "readOnlyHint": false,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "recipient_user_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 1,
+              "maxItems": 500
+            },
+            "channel": {
+              "type": "string",
+              "enum": [
+                "in_app",
+                "email"
+              ],
+              "default": "in_app"
+            },
+            "subject": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 4000
+            },
+            "template_key": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          },
+          "required": [
+            "recipient_user_ids"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "schedule_notification",
         "title": "Schedule notification",
-        "description": "Schedule a notification for later delivery. (Not yet available — ships in Phase 7 (Notifications).)",
+        "description": "Queue a notification for future delivery. Same access rules as send_notification; delivery worker consumes rows where status='scheduled' AND scheduled_at <= now().",
         "annotations": {
-          "readOnlyHint": true,
+          "readOnlyHint": false,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "recipient_user_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 1,
+              "maxItems": 500
+            },
+            "channel": {
+              "type": "string",
+              "enum": [
+                "in_app",
+                "email"
+              ],
+              "default": "in_app"
+            },
+            "subject": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 4000
+            },
+            "template_key": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "data": {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            "scheduled_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO-8601 timestamp in the future."
+            }
+          },
+          "required": [
+            "recipient_user_ids",
+            "scheduled_at"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
       {
         "name": "notification_history",
         "title": "Notification history",
-        "description": "List notifications sent/scheduled. (Not yet available — ships in Phase 7 (Notifications).)",
+        "description": "List notifications visible under RLS (recipient's own, sender's own, admin/faculty/event-manager view). Filter by status, channel, or event.",
         "annotations": {
           "readOnlyHint": true,
           "openWorldHint": false
         },
         "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
-          "properties": {}
+          "properties": {
+            "recipient_user_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "channel": {
+              "type": "string",
+              "enum": [
+                "in_app",
+                "email"
+              ]
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "queued",
+                "scheduled",
+                "sent",
+                "failed",
+                "read",
+                "cancelled"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       }
