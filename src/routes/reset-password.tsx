@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/reset-password")({
 });
 
 function ResetPasswordPage() {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"request" | "update">("request");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,7 +45,7 @@ function ResetPasswordPage() {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Password updated. You are signed in.");
-    window.location.href = "/dashboard";
+    navigate({ to: "/dashboard" });
   }
 
   return (
