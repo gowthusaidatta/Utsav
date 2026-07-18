@@ -27,6 +27,7 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authenticated/events.new'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminUserApprovalsRouteImport } from './routes/_authenticated/admin.user-approvals'
 import { Route as AuthenticatedAdminRoleMatrixRouteImport } from './routes/_authenticated/admin.role-matrix'
 import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin.organizations'
 import { Route as AuthenticatedAdminDelegationsRouteImport } from './routes/_authenticated/admin.delegations'
@@ -131,6 +132,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminUserApprovalsRoute =
+  AuthenticatedAdminUserApprovalsRouteImport.update({
+    id: '/admin/user-approvals',
+    path: '/admin/user-approvals',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRoleMatrixRoute =
   AuthenticatedAdminRoleMatrixRouteImport.update({
     id: '/admin/role-matrix',
@@ -213,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/admin/role-matrix': typeof AuthenticatedAdminRoleMatrixRoute
+  '/admin/user-approvals': typeof AuthenticatedAdminUserApprovalsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
   '/admin/organizations/$id': typeof AuthenticatedAdminOrganizationsIdRoute
@@ -242,6 +250,7 @@ export interface FileRoutesByTo {
   '/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/admin/role-matrix': typeof AuthenticatedAdminRoleMatrixRoute
+  '/admin/user-approvals': typeof AuthenticatedAdminUserApprovalsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
   '/admin/organizations/$id': typeof AuthenticatedAdminOrganizationsIdRoute
@@ -273,6 +282,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
   '/_authenticated/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/_authenticated/admin/role-matrix': typeof AuthenticatedAdminRoleMatrixRoute
+  '/_authenticated/admin/user-approvals': typeof AuthenticatedAdminUserApprovalsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/events/new': typeof AuthenticatedEventsNewRoute
   '/_authenticated/admin/organizations/$id': typeof AuthenticatedAdminOrganizationsIdRoute
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/admin/delegations'
     | '/admin/organizations'
     | '/admin/role-matrix'
+    | '/admin/user-approvals'
     | '/admin/users'
     | '/events/new'
     | '/admin/organizations/$id'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/admin/delegations'
     | '/admin/organizations'
     | '/admin/role-matrix'
+    | '/admin/user-approvals'
     | '/admin/users'
     | '/events/new'
     | '/admin/organizations/$id'
@@ -363,6 +375,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/delegations'
     | '/_authenticated/admin/organizations'
     | '/_authenticated/admin/role-matrix'
+    | '/_authenticated/admin/user-approvals'
     | '/_authenticated/admin/users'
     | '/_authenticated/events/new'
     | '/_authenticated/admin/organizations/$id'
@@ -515,6 +528,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/user-approvals': {
+      id: '/_authenticated/admin/user-approvals'
+      path: '/admin/user-approvals'
+      fullPath: '/admin/user-approvals'
+      preLoaderRoute: typeof AuthenticatedAdminUserApprovalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/role-matrix': {
       id: '/_authenticated/admin/role-matrix'
       path: '/admin/role-matrix'
@@ -613,6 +633,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminDelegationsRoute: typeof AuthenticatedAdminDelegationsRoute
   AuthenticatedAdminOrganizationsRoute: typeof AuthenticatedAdminOrganizationsRouteWithChildren
   AuthenticatedAdminRoleMatrixRoute: typeof AuthenticatedAdminRoleMatrixRoute
+  AuthenticatedAdminUserApprovalsRoute: typeof AuthenticatedAdminUserApprovalsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute
   AuthenticatedEventsIdManageRoute: typeof AuthenticatedEventsIdManageRoute
@@ -631,6 +652,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminOrganizationsRoute:
     AuthenticatedAdminOrganizationsRouteWithChildren,
   AuthenticatedAdminRoleMatrixRoute: AuthenticatedAdminRoleMatrixRoute,
+  AuthenticatedAdminUserApprovalsRoute: AuthenticatedAdminUserApprovalsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
   AuthenticatedEventsIdManageRoute: AuthenticatedEventsIdManageRoute,
