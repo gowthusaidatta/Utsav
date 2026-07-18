@@ -121,13 +121,16 @@ function ManageEvent() {
           </div>
           <h1 className="mt-2 text-2xl font-bold tracking-tight">{q.data.title}</h1>
         </div>
-        {q.data.status === "published" && (
+        <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link to="/events/$slug" params={{ slug: q.data.slug }}>
-              View public page
-            </Link>
+            <Link to="/events/$id/registrations" params={{ id }}>Registrations</Link>
           </Button>
-        )}
+          {q.data.status === "published" && (
+            <Button variant="outline" asChild>
+              <Link to="/events/$slug" params={{ slug: q.data.slug }}>View public page</Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       <Card>
