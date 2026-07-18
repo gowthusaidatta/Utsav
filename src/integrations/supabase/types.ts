@@ -748,6 +748,8 @@ export type Database = {
         | "sponsor"
         | "finance"
         | "media"
+        | "student_coordinator"
+        | "guest"
       event_status:
         | "draft"
         | "pending_approval"
@@ -902,6 +904,8 @@ export const Constants = {
         "sponsor",
         "finance",
         "media",
+        "student_coordinator",
+        "guest",
       ],
       event_status: [
         "draft",
