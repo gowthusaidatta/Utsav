@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -8,6 +8,10 @@ import {
   assignRole,
   revokeRole,
   getMyAuditLog,
+  getActorContext,
+  ROLE_RANK,
+  ROLE_LABEL,
+  type AppRole,
 } from "@/lib/authz.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -43,19 +47,25 @@ function AdminUsersPage() {
   const assignFn = useServerFn(assignRole);
   const revokeFn = useServerFn(revokeRole);
   const auditFn = useServerFn(getMyAuditLog);
+  const meFn = useServerFn(getActorContext);
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [committed, setCommitted] = useState("");
+  const me = useQuery({ queryKey: ["actor-ctx"], queryFn: () => meFn() });
+  const actorRank = me.data?.rank ?? 0;
+  const assignable = (Object.keys(ROLE_RANK) as AppRole[])
+    .filter((r) => ROLE_RANK[r] < actorRank && r !== "admin")
+    .sort((a, b) => ROLE_RANK[b] - ROLE_RANK[a]);
   const users = useQuery({
     queryKey: ["admin-users", committed],
     queryFn: () => listFn({ data: committed ? { search: committed } : {} }),
   });
   const audit = useQuery({ queryKey: ["my-audit"], queryFn: () => auditFn() });
 
-  const [pending, setPending] = useState<Record<string, (typeof ROLES)[number]>>({});
+  const [pending, setPending] = useState<Record<string, AppRole>>({});
 
   const assign = useMutation({
-    mutationFn: (v: { userId: string; role: (typeof ROLES)[number] }) =>
+    mutationFn: (v: { userId: string; role: AppRole }) =>
       assignFn({ data: { userId: v.userId, role: v.role, scope: "global" } }),
     onSuccess: () => {
       toast.success("Role assigned");
@@ -183,16 +193,16 @@ function AdminUsersPage() {
                       <Select
                         value={pending[u.id] ?? ""}
                         onValueChange={(v) =>
-                          setPending({ ...pending, [u.id]: v as (typeof ROLES)[number] })
+                          setPending({ ...pending, [u.id]: v as AppRole })
                         }
                       >
                         <SelectTrigger className="h-8 w-40">
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
-                          {ROLES.map((r) => (
+                          {assignable.map((r) => (
                             <SelectItem key={r} value={r}>
-                              {ROLE_LABELS[r]}
+                              {ROLE_LABEL[r]}
                             </SelectItem>
                           ))}
                         </SelectContent>

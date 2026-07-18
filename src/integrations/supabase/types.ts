@@ -481,40 +481,73 @@ export type Database = {
       }
       profiles: {
         Row: {
+          academic_year: string | null
           avatar_url: string | null
           college: string | null
           created_at: string
           department: string | null
+          designation: string | null
+          desired_role: Database["public"]["Enums"]["app_role"] | null
           email: string
+          employee_id: string | null
+          faculty_id: string | null
           full_name: string | null
           id: string
           is_active: boolean
           phone: string | null
+          rejection_reason: string | null
+          roll_number: string | null
+          section: string | null
           updated_at: string
+          verification_status: string
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
+          academic_year?: string | null
           avatar_url?: string | null
           college?: string | null
           created_at?: string
           department?: string | null
+          designation?: string | null
+          desired_role?: Database["public"]["Enums"]["app_role"] | null
           email: string
+          employee_id?: string | null
+          faculty_id?: string | null
           full_name?: string | null
           id: string
           is_active?: boolean
           phone?: string | null
+          rejection_reason?: string | null
+          roll_number?: string | null
+          section?: string | null
           updated_at?: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
+          academic_year?: string | null
           avatar_url?: string | null
           college?: string | null
           created_at?: string
           department?: string | null
+          designation?: string | null
+          desired_role?: Database["public"]["Enums"]["app_role"] | null
           email?: string
+          employee_id?: string | null
+          faculty_id?: string | null
           full_name?: string | null
           id?: string
           is_active?: boolean
           phone?: string | null
+          rejection_reason?: string | null
+          roll_number?: string | null
+          section?: string | null
           updated_at?: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -699,7 +732,18 @@ export type Database = {
         Args: { _action: string; _event?: string; _uid: string }
         Returns: boolean
       }
+      can_assign_role: {
+        Args: {
+          _actor: string
+          _target_role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
       can_create_event: { Args: { _uid: string }; Returns: boolean }
+      can_manage_user: {
+        Args: { _actor: string; _target: string }
+        Returns: boolean
+      }
       has_any_global_role: {
         Args: { _roles: string[]; _uid: string }
         Returns: boolean
@@ -729,6 +773,11 @@ export type Database = {
         Returns: boolean
       }
       is_platform_admin: { Args: { _uid: string }; Returns: boolean }
+      max_global_rank: { Args: { _uid: string }; Returns: number }
+      role_rank: {
+        Args: { _role: Database["public"]["Enums"]["app_role"] }
+        Returns: number
+      }
     }
     Enums: {
       app_role:
@@ -748,6 +797,8 @@ export type Database = {
         | "sponsor"
         | "finance"
         | "media"
+        | "student_coordinator"
+        | "guest"
       event_status:
         | "draft"
         | "pending_approval"
@@ -902,6 +953,8 @@ export const Constants = {
         "sponsor",
         "finance",
         "media",
+        "student_coordinator",
+        "guest",
       ],
       event_status: [
         "draft",

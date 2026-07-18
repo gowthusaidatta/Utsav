@@ -49,6 +49,8 @@ const credentialsSchema = z.object({
   fullName: z.string().trim().max(120).optional(),
 });
 
+type SignupRole = "student" | "faculty" | "coordinator" | "student_coordinator" | "guest";
+
 function AuthPage() {
   const { mode, next } = Route.useSearch();
   const navigate = useNavigate();
@@ -56,6 +58,15 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [college, setCollege] = useState("");
+  const [department, setDepartment] = useState("");
+  const [rollNumber, setRollNumber] = useState("");
+  const [facultyId, setFacultyId] = useState("");
+  const [academicYear, setAcademicYear] = useState("");
+  const [section, setSection] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [desiredRole, setDesiredRole] = useState<SignupRole>("student");
   const [busy, setBusy] = useState(false);
 
   async function handleGoogle() {
@@ -79,6 +90,19 @@ function AuthPage() {
       toast.error(parsed.error.issues[0]?.message ?? "Invalid input");
       return;
     }
+    if (isSignup) {
+      // Client-side identity validation per role. Server also re-checks on approval.
+      if (desiredRole === "student" || desiredRole === "student_coordinator") {
+        if (!rollNumber.trim()) return toast.error("Roll number is required");
+        if (!college.trim() || !department.trim())
+          return toast.error("College and department are required");
+      }
+      if (desiredRole === "faculty" || desiredRole === "coordinator") {
+        if (!facultyId.trim()) return toast.error("Faculty ID is required");
+        if (!college.trim() || !department.trim())
+          return toast.error("College and department are required");
+      }
+    }
     setBusy(true);
     try {
       if (isSignup) {
@@ -87,17 +111,37 @@ function AuthPage() {
           password: parsed.data.password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth`,
-            data: { full_name: parsed.data.fullName },
+            data: {
+              full_name: parsed.data.fullName,
+              phone: phone.trim() || undefined,
+              college: college.trim() || undefined,
+              department: department.trim() || undefined,
+              roll_number: rollNumber.trim() || undefined,
+              faculty_id: facultyId.trim() || undefined,
+              academic_year: academicYear.trim() || undefined,
+              section: section.trim() || undefined,
+              designation: designation.trim() || undefined,
+              desired_role: desiredRole,
+            },
           },
         });
         if (error) throw error;
-        // If email confirmation is required, no session is returned — stay on /auth.
         if (!data.session) {
-          toast.success("Account created. Check your email to confirm and sign in.");
+          const needsApproval =
+            desiredRole !== "student" && desiredRole !== "guest";
+          toast.success(
+            needsApproval
+              ? "Account created. Your role requires admin approval — check your email to confirm sign-in first."
+              : "Account created. Check your email to confirm and sign in.",
+          );
           setBusy(false);
           return;
         }
-        toast.success("Account created.");
+        toast.success(
+          desiredRole === "student" || desiredRole === "guest"
+            ? "Account created."
+            : "Account created. Your elevated role is pending admin approval.",
+        );
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: parsed.data.email,
@@ -141,16 +185,83 @@ function AuthPage() {
           </div>
           <form onSubmit={handleSubmit} className="space-y-3">
             {isSignup && (
-              <div className="space-y-1.5">
-                <Label htmlFor="fullName">Full name</Label>
-                <Input
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Ada Lovelace"
-                  maxLength={120}
-                />
-              </div>
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="fullName">Full name</Label>
+                  <Input
+                    id="fullName"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Ada Lovelace"
+                    maxLength={120}
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="desiredRole">I am signing up as</Label>
+                  <select
+                    id="desiredRole"
+                    className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    value={desiredRole}
+                    onChange={(e) => setDesiredRole(e.target.value as SignupRole)}
+                  >
+                    <option value="student">Student</option>
+                    <option value="student_coordinator">Student Coordinator (needs approval)</option>
+                    <option value="faculty">Faculty (needs approval)</option>
+                    <option value="coordinator">Faculty Coordinator (needs approval)</option>
+                    <option value="guest">Guest</option>
+                  </select>
+                  {desiredRole !== "student" && desiredRole !== "guest" && (
+                    <p className="text-xs text-muted-foreground">
+                      Elevated roles require verification by an authorized admin.
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone">Mobile number</Label>
+                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={20} />
+                </div>
+                {desiredRole !== "guest" && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="college">College</Label>
+                      <Input id="college" value={college} onChange={(e) => setCollege(e.target.value)} maxLength={120} required />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="department">Department</Label>
+                      <Input id="department" value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={120} required />
+                    </div>
+                  </div>
+                )}
+                {(desiredRole === "student" || desiredRole === "student_coordinator") && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="rollNumber">Roll number</Label>
+                      <Input id="rollNumber" value={rollNumber} onChange={(e) => setRollNumber(e.target.value)} maxLength={40} required />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="academicYear">Academic year</Label>
+                      <Input id="academicYear" value={academicYear} onChange={(e) => setAcademicYear(e.target.value)} placeholder="2025-26" maxLength={20} />
+                    </div>
+                    <div className="space-y-1.5 col-span-2">
+                      <Label htmlFor="section">Section (optional)</Label>
+                      <Input id="section" value={section} onChange={(e) => setSection(e.target.value)} maxLength={10} />
+                    </div>
+                  </div>
+                )}
+                {(desiredRole === "faculty" || desiredRole === "coordinator") && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="facultyId">Faculty ID</Label>
+                      <Input id="facultyId" value={facultyId} onChange={(e) => setFacultyId(e.target.value)} maxLength={40} required />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="designation">Designation</Label>
+                      <Input id="designation" value={designation} onChange={(e) => setDesignation(e.target.value)} placeholder="Assistant Professor" maxLength={80} />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
