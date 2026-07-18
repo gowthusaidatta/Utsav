@@ -730,6 +730,15 @@ export type Database = {
         | "judge"
         | "faculty"
         | "admin"
+        | "super_admin"
+        | "platform_admin"
+        | "org_admin"
+        | "college_admin"
+        | "dept_admin"
+        | "mentor"
+        | "sponsor"
+        | "finance"
+        | "media"
       event_status:
         | "draft"
         | "pending_approval"
@@ -875,6 +884,15 @@ export const Constants = {
         "judge",
         "faculty",
         "admin",
+        "super_admin",
+        "platform_admin",
+        "org_admin",
+        "college_admin",
+        "dept_admin",
+        "mentor",
+        "sponsor",
+        "finance",
+        "media",
       ],
       event_status: [
         "draft",
