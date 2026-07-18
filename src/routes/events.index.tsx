@@ -1,16 +1,31 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery, queryOptions } from "@tanstack/react-query";
+import { useState } from "react";
+import { z } from "zod";
 import { listPublicEvents } from "@/lib/events.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Calendar, MapPin, Sparkles, Search } from "lucide-react";
 
-const publicEventsOptions = queryOptions({
-  queryKey: ["public-events"],
-  queryFn: () => listPublicEvents({ data: { limit: 48 } }),
+const searchSchema = z.object({
+  q: z.string().trim().max(120).optional().catch(undefined),
+  category: z.string().trim().max(64).optional().catch(undefined),
 });
 
+const publicEventsOptions = (params: { q?: string; category?: string }) =>
+  queryOptions({
+    queryKey: ["public-events", params.q ?? "", params.category ?? ""],
+    queryFn: () =>
+      listPublicEvents({
+        data: { limit: 48, q: params.q || undefined, category: params.category || undefined },
+      }),
+  });
+
 export const Route = createFileRoute("/events/")({
+  validateSearch: searchSchema,
+  loaderDeps: ({ search }) => ({ q: search.q, category: search.category }),
   head: () => ({
     meta: [
       { title: "Browse Events — Utsav" },
@@ -26,7 +41,8 @@ export const Route = createFileRoute("/events/")({
       },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(publicEventsOptions),
+  loader: ({ context, deps }) =>
+    context.queryClient.ensureQueryData(publicEventsOptions(deps)),
   component: EventsIndex,
 });
 
@@ -41,8 +57,23 @@ function formatDate(iso: string | null) {
 }
 
 function EventsIndex() {
-  const { data } = useSuspenseQuery(publicEventsOptions);
-  const events = data.events;
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const [q, setQ] = useState(search.q ?? "");
+  const [category, setCategory] = useState(search.category ?? "");
+
+  const query = useQuery(publicEventsOptions({ q: search.q, category: search.category }));
+  const events = query.data?.events ?? [];
+
+  function apply(e: React.FormEvent) {
+    e.preventDefault();
+    navigate({
+      search: {
+        q: q.trim() || undefined,
+        category: category.trim() || undefined,
+      },
+    });
+  }
 
   return (
     <main className="container mx-auto px-4 py-10">
@@ -56,10 +87,49 @@ function EventsIndex() {
         </p>
       </header>
 
-      {events.length === 0 ? (
+      <form onSubmit={apply} className="mb-6 grid gap-2 sm:grid-cols-[1fr_220px_auto]">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search events, keywords, descriptions…"
+            className="pl-9"
+            maxLength={120}
+          />
+        </div>
+        <Input
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder="Category (e.g. hackathon)"
+          maxLength={64}
+        />
+        <div className="flex gap-2">
+          <Button type="submit">Search</Button>
+          {(search.q || search.category) && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setQ("");
+                setCategory("");
+                navigate({ search: {} });
+              }}
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+      </form>
+
+      {query.isLoading ? (
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      ) : events.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            No published events yet — check back soon.
+            {search.q || search.category
+              ? "No events match your search."
+              : "No published events yet — check back soon."}
           </CardContent>
         </Card>
       ) : (
@@ -99,7 +169,7 @@ function EventsIndex() {
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />{" "}
-                    {e.is_online ? "Online" : e.venue ?? "Venue TBA"}
+                    {e.is_online ? "Online" : (e.venue ?? "Venue TBA")}
                   </div>
                 </CardContent>
               </Card>

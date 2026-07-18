@@ -1,17 +1,35 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import { listMyEvents } from "@/lib/events.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Calendar } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/_authenticated/my-events")({
   head: () => ({ meta: [{ title: "My Events — Utsav" }] }),
   component: MyEvents,
 });
+
+const STATUSES = [
+  "all",
+  "draft",
+  "pending_approval",
+  "published",
+  "cancelled",
+  "completed",
+  "archived",
+] as const;
 
 function statusColor(s: string) {
   switch (s) {
@@ -31,22 +49,48 @@ function statusColor(s: string) {
 
 function MyEvents() {
   const fn = useServerFn(listMyEvents);
-  const q = useQuery({ queryKey: ["my-events"], queryFn: () => fn() });
+  const [status, setStatus] = useState<(typeof STATUSES)[number]>("all");
+  const q = useQuery({
+    queryKey: ["my-events", status],
+    queryFn: () =>
+      fn({
+        data:
+          status === "all"
+            ? {}
+            : {
+                status: status as Exclude<(typeof STATUSES)[number], "all">,
+              },
+      }),
+  });
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">My events</h1>
           <p className="text-sm text-muted-foreground">
             Events you own, organize, coordinate, judge, or volunteer for.
           </p>
         </div>
-        <Button asChild>
-          <Link to="/events/new">
-            <Plus className="mr-2 h-4 w-4" /> New event
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s === "all" ? "All statuses" : s}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button asChild>
+            <Link to="/events/new">
+              <Plus className="mr-2 h-4 w-4" /> New event
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {q.isLoading ? (
@@ -58,11 +102,17 @@ function MyEvents() {
       ) : (q.data ?? []).length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-sm text-muted-foreground">
-            You don't have any events yet.{" "}
-            <Link to="/events/new" className="text-primary hover:underline">
-              Create your first event
-            </Link>
-            .
+            {status === "all" ? (
+              <>
+                You don't have any events yet.{" "}
+                <Link to="/events/new" className="text-primary hover:underline">
+                  Create your first event
+                </Link>
+                .
+              </>
+            ) : (
+              <>No events with status “{status}”.</>
+            )}
           </CardContent>
         </Card>
       ) : (
