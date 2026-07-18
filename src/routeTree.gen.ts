@@ -25,6 +25,7 @@ import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin.organizations'
 import { Route as AuthenticatedAdminDelegationsRouteImport } from './routes/_authenticated/admin.delegations'
+import { Route as AuthenticatedAdminApprovalsRouteImport } from './routes/_authenticated/admin.approvals'
 import { Route as AuthenticatedEventsSlugRegisterRouteImport } from './routes/_authenticated/events.$slug.register'
 import { Route as AuthenticatedEventsIdRegistrationsRouteImport } from './routes/_authenticated/events.$id.registrations'
 import { Route as AuthenticatedEventsIdManageRouteImport } from './routes/_authenticated/events.$id.manage'
@@ -113,6 +114,12 @@ const AuthenticatedAdminDelegationsRoute =
     path: '/admin/delegations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminApprovalsRoute =
+  AuthenticatedAdminApprovalsRouteImport.update({
+    id: '/admin/approvals',
+    path: '/admin/approvals',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEventsSlugRegisterRoute =
   AuthenticatedEventsSlugRegisterRouteImport.update({
     id: '/events/$slug/register',
@@ -150,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/events/': typeof EventsIndexRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -171,6 +179,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/events': typeof EventsIndexRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -194,6 +203,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/events/': typeof EventsIndexRoute
+  '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/_authenticated/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
   '/_authenticated/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/events/$slug'
     | '/events/'
+    | '/admin/approvals'
     | '/admin/delegations'
     | '/admin/organizations'
     | '/admin/users'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/events/$slug'
     | '/events'
+    | '/admin/approvals'
     | '/admin/delegations'
     | '/admin/organizations'
     | '/admin/users'
@@ -260,6 +272,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/events/$slug'
     | '/events/'
+    | '/_authenticated/admin/approvals'
     | '/_authenticated/admin/delegations'
     | '/_authenticated/admin/organizations'
     | '/_authenticated/admin/users'
@@ -394,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDelegationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/approvals': {
+      id: '/_authenticated/admin/approvals'
+      path: '/admin/approvals'
+      fullPath: '/admin/approvals'
+      preLoaderRoute: typeof AuthenticatedAdminApprovalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/events/$slug/register': {
       id: '/_authenticated/events/$slug/register'
       path: '/events/$slug/register'
@@ -446,6 +466,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyEventsRoute: typeof AuthenticatedMyEventsRoute
   AuthenticatedMyRegistrationsRoute: typeof AuthenticatedMyRegistrationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRoute
   AuthenticatedAdminDelegationsRoute: typeof AuthenticatedAdminDelegationsRoute
   AuthenticatedAdminOrganizationsRoute: typeof AuthenticatedAdminOrganizationsRouteWithChildren
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -461,6 +482,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyEventsRoute: AuthenticatedMyEventsRoute,
   AuthenticatedMyRegistrationsRoute: AuthenticatedMyRegistrationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedAdminApprovalsRoute: AuthenticatedAdminApprovalsRoute,
   AuthenticatedAdminDelegationsRoute: AuthenticatedAdminDelegationsRoute,
   AuthenticatedAdminOrganizationsRoute:
     AuthenticatedAdminOrganizationsRouteWithChildren,

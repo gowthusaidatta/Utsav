@@ -21,6 +21,7 @@ function Dashboard() {
   const profile = useQuery({ queryKey: ["my-profile"], queryFn: () => profileFn() });
   const router = useRouter();
   const isAdmin = (roles.data ?? []).some((r) => r.role === "admin" && r.scope === "global");
+  const isFaculty = (roles.data ?? []).some((r) => r.role === "faculty" && r.scope === "global");
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-6">
@@ -77,20 +78,29 @@ function Dashboard() {
         </Card>
       </div>
 
-      {isAdmin && (
+      {(isAdmin || isFaculty) && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Admin</CardTitle>
+            <CardTitle className="text-base">
+              {isAdmin ? "Admin" : "Faculty"}
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Button asChild size="sm">
-              <Link to="/admin/users">Users & roles</Link>
-            </Button>
+            {isAdmin && (
+              <>
+                <Button asChild size="sm">
+                  <Link to="/admin/users">Users & roles</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/admin/organizations">Organizations</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/admin/delegations">Delegations</Link>
+                </Button>
+              </>
+            )}
             <Button asChild size="sm" variant="outline">
-              <Link to="/admin/organizations">Organizations</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link to="/admin/delegations">Delegations</Link>
+              <Link to="/admin/approvals">Event approvals</Link>
             </Button>
           </CardContent>
         </Card>
