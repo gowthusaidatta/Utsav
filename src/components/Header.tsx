@@ -26,7 +26,17 @@ export function Header() {
     navigate({ to: "/auth", replace: true });
   }
 
-  const initials = (user?.email ?? "?").slice(0, 2).toUpperCase();
+  const displayName =
+    (user?.user_metadata?.full_name as string | undefined) ??
+    user?.email ??
+    "";
+  const initials =
+    displayName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("") || "U";
 
   return (
     <header className="border-b bg-background/95 backdrop-blur sticky top-0 z-40">
@@ -43,7 +53,9 @@ export function Header() {
                   <Avatar className="h-7 w-7">
                     <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                   </Avatar>
-                  <span className="hidden sm:inline text-sm">{user.email}</span>
+                  <span className="hidden sm:inline text-sm max-w-[160px] truncate">
+                    {displayName}
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -54,6 +66,9 @@ export function Header() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate({ to: "/my-registrations" })}>
                   <Ticket className="mr-2 h-4 w-4" /> My registrations
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/delegations" })}>
+                  <UserIcon className="mr-2 h-4 w-4" /> Delegations
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
                   <UserIcon className="mr-2 h-4 w-4" /> Profile
