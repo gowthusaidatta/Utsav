@@ -32,7 +32,7 @@ export default defineTool({
 
     const admin = await adminClient();
     const { data, error } = await admin.from("permission_delegations").insert({
-      delegator_user_id: actor,
+      delegator_user_id: actor!,
       delegate_user_id: input.delegate_user_id,
       role: input.role,
       scope: "event",
