@@ -223,7 +223,6 @@ export const createEvent = createServerFn({ method: "POST" })
     const { data: allowed, error: permErr } = await context.supabase.rpc("can", {
       _uid: context.userId,
       _action: "create_event",
-      _event: null,
     });
     if (permErr) throw new Error(permErr.message);
     if (!allowed)
