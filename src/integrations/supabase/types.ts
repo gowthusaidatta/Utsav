@@ -14,16 +14,258 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_logs: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          ip: string | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      org_members: {
+        Row: {
+          joined_at: string
+          org_id: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          org_id: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          org_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_members_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          parent_org_id: string | null
+          slug: string
+          type: Database["public"]["Enums"]["org_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          parent_org_id?: string | null
+          slug: string
+          type?: Database["public"]["Enums"]["org_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          parent_org_id?: string | null
+          slug?: string
+          type?: Database["public"]["Enums"]["org_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organizations_parent_org_id_fkey"
+            columns: ["parent_org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      permission_delegations: {
+        Row: {
+          delegate_user_id: string
+          delegator_user_id: string
+          expires_at: string
+          granted_at: string
+          id: string
+          revoked_at: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          scope: Database["public"]["Enums"]["role_scope"]
+          scope_id: string | null
+        }
+        Insert: {
+          delegate_user_id: string
+          delegator_user_id: string
+          expires_at: string
+          granted_at?: string
+          id?: string
+          revoked_at?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          scope: Database["public"]["Enums"]["role_scope"]
+          scope_id?: string | null
+        }
+        Update: {
+          delegate_user_id?: string
+          delegator_user_id?: string
+          expires_at?: string
+          granted_at?: string
+          id?: string
+          revoked_at?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          scope?: Database["public"]["Enums"]["role_scope"]
+          scope_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          college: string | null
+          created_at: string
+          department: string | null
+          email: string
+          full_name: string | null
+          id: string
+          is_active: boolean
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          college?: string | null
+          created_at?: string
+          department?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          is_active?: boolean
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          college?: string | null
+          created_at?: string
+          department?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          scope: Database["public"]["Enums"]["role_scope"]
+          scope_id: string | null
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          scope?: Database["public"]["Enums"]["role_scope"]
+          scope_id?: string | null
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          scope?: Database["public"]["Enums"]["role_scope"]
+          scope_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can: {
+        Args: { _action: string; _event?: string; _uid: string }
+        Returns: boolean
+      }
+      has_global_role: {
+        Args: { _role: Database["public"]["Enums"]["app_role"]; _uid: string }
+        Returns: boolean
+      }
+      has_role_in_event: {
+        Args: {
+          _event: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _uid: string
+        }
+        Returns: boolean
+      }
+      has_role_in_org: {
+        Args: {
+          _org: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _uid: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "student"
+        | "volunteer"
+        | "organizer"
+        | "coordinator"
+        | "judge"
+        | "faculty"
+        | "admin"
+      org_type: "college" | "department" | "club" | "external"
+      role_scope: "global" | "organization" | "event"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +392,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "student",
+        "volunteer",
+        "organizer",
+        "coordinator",
+        "judge",
+        "faculty",
+        "admin",
+      ],
+      org_type: ["college", "department", "club", "external"],
+      role_scope: ["global", "organization", "event"],
+    },
   },
 } as const
