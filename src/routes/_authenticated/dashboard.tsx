@@ -20,8 +20,14 @@ function Dashboard() {
   const roles = useQuery({ queryKey: ["my-roles"], queryFn: () => rolesFn() });
   const profile = useQuery({ queryKey: ["my-profile"], queryFn: () => profileFn() });
   const router = useRouter();
-  const isAdmin = (roles.data ?? []).some((r) => r.role === "admin" && r.scope === "global");
-  const isFaculty = (roles.data ?? []).some((r) => r.role === "faculty" && r.scope === "global");
+  const activeRoles = (roles.data ?? []).filter(
+    (r) => !r.expires_at || new Date(r.expires_at) > new Date(),
+  );
+  const isAdmin = activeRoles.some((r) => r.role === "admin" && r.scope === "global");
+  const isFaculty = activeRoles.some((r) => r.role === "faculty" && r.scope === "global");
+  const canCreateEvent = activeRoles.some((r) =>
+    ["admin", "faculty", "organizer", "coordinator"].includes(r.role),
+  );
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-6">
