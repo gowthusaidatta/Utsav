@@ -76,12 +76,26 @@ export const getOrganization = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!org) throw new Error("Organization not found");
 
-    const { data: members } = await context.supabase
+    const { data: memberRows } = await context.supabase
       .from("org_members")
-      .select("user_id, joined_at, user:profiles!org_members_user_id_fkey(id, full_name, email)")
+      .select("user_id, joined_at")
       .eq("org_id", data.id);
+    const userIds = (memberRows ?? []).map((m) => m.user_id);
+    let profilesById = new Map<string, { id: string; full_name: string | null; email: string }>();
+    if (userIds.length > 0) {
+      const { data: profs } = await context.supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", userIds);
+      profilesById = new Map((profs ?? []).map((p) => [p.id, p]));
+    }
+    const members = (memberRows ?? []).map((m) => ({
+      user_id: m.user_id,
+      joined_at: m.joined_at,
+      user: profilesById.get(m.user_id) ?? null,
+    }));
 
-    return { ...org, members: members ?? [] };
+    return { ...org, members };
   });
 
 // ---------------------------------------------------------------
