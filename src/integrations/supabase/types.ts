@@ -50,6 +50,68 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          code: string
+          created_at: string
+          event_id: string
+          id: string
+          issued_at: string
+          issued_by: string
+          metadata: Json
+          revoked_at: string | null
+          revoked_reason: string | null
+          storage_path: string | null
+          template_key: string
+          updated_at: string
+          user_id: string
+          variables: Json
+          verification_hash: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          event_id: string
+          id?: string
+          issued_at?: string
+          issued_by: string
+          metadata?: Json
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          storage_path?: string | null
+          template_key?: string
+          updated_at?: string
+          user_id: string
+          variables?: Json
+          verification_hash: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          issued_at?: string
+          issued_by?: string
+          metadata?: Json
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          storage_path?: string | null
+          template_key?: string
+          updated_at?: string
+          user_id?: string
+          variables?: Json
+          verification_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           capacity: number | null
@@ -138,6 +200,178 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media: {
+        Row: {
+          bucket: string
+          checksum: string | null
+          created_at: string
+          event_id: string | null
+          filename: string
+          id: string
+          kind: string
+          metadata: Json
+          mime_type: string
+          owner_id: string
+          owner_type: string
+          scan_status: string
+          size_bytes: number
+          storage_path: string
+          thumbnail_path: string | null
+          updated_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          bucket?: string
+          checksum?: string | null
+          created_at?: string
+          event_id?: string | null
+          filename: string
+          id?: string
+          kind: string
+          metadata?: Json
+          mime_type: string
+          owner_id: string
+          owner_type: string
+          scan_status?: string
+          size_bytes: number
+          storage_path: string
+          thumbnail_path?: string | null
+          updated_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          bucket?: string
+          checksum?: string | null
+          created_at?: string
+          event_id?: string | null
+          filename?: string
+          id?: string
+          kind?: string
+          metadata?: Json
+          mime_type?: string
+          owner_id?: string
+          owner_type?: string
+          scan_status?: string
+          size_bytes?: number
+          storage_path?: string
+          thumbnail_path?: string | null
+          updated_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_templates: {
+        Row: {
+          body_template: string
+          channel: string
+          created_at: string
+          created_by: string | null
+          id: string
+          key: string
+          name: string
+          subject_template: string | null
+          updated_at: string
+        }
+        Insert: {
+          body_template: string
+          channel: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key: string
+          name: string
+          subject_template?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body_template?: string
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key?: string
+          name?: string
+          subject_template?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string
+          channel: string
+          created_at: string
+          data: Json
+          event_id: string | null
+          id: string
+          last_error: string | null
+          read_at: string | null
+          recipient_user_id: string
+          retry_count: number
+          scheduled_at: string | null
+          sender_user_id: string | null
+          sent_at: string | null
+          status: string
+          subject: string | null
+          template_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          channel: string
+          created_at?: string
+          data?: Json
+          event_id?: string | null
+          id?: string
+          last_error?: string | null
+          read_at?: string | null
+          recipient_user_id: string
+          retry_count?: number
+          scheduled_at?: string | null
+          sender_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          template_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          channel?: string
+          created_at?: string
+          data?: Json
+          event_id?: string | null
+          id?: string
+          last_error?: string | null
+          read_at?: string | null
+          recipient_user_id?: string
+          retry_count?: number
+          scheduled_at?: string | null
+          sender_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          template_key?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
