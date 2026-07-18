@@ -660,7 +660,7 @@ export const listAllDelegations = createServerFn({ method: "GET" })
       .select(
         "id, delegator_user_id, delegate_user_id, role, scope, scope_id, granted_at, expires_at, revoked_at",
       )
-      .order("created_at", { ascending: false })
+      .order("granted_at", { ascending: false })
       .limit(500);
     if (error) throw new Error(error.message);
     return data ?? [];
@@ -675,7 +675,7 @@ export const listMyDelegations = createServerFn({ method: "GET" })
         "id, delegator_user_id, delegate_user_id, role, scope, scope_id, granted_at, expires_at, revoked_at",
       )
       .eq("delegate_user_id", context.userId)
-      .order("created_at", { ascending: false });
+      .order("granted_at", { ascending: false });
     if (iErr) throw new Error(iErr.message);
 
     const { data: outgoing, error: oErr } = await context.supabase
@@ -684,7 +684,7 @@ export const listMyDelegations = createServerFn({ method: "GET" })
         "id, delegator_user_id, delegate_user_id, role, scope, scope_id, granted_at, expires_at, revoked_at",
       )
       .eq("delegator_user_id", context.userId)
-      .order("created_at", { ascending: false });
+      .order("granted_at", { ascending: false });
     if (oErr) throw new Error(oErr.message);
 
     return { incoming: incoming ?? [], outgoing: outgoing ?? [] };
