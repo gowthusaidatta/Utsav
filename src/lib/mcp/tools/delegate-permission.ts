@@ -13,7 +13,6 @@ export default defineTool({
     role: z.enum(ROLES),
     event_id: z.string().uuid(),
     expires_at: z.string().datetime(),
-    reason: z.string().trim().max(500).optional(),
   },
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
   handler: async (input, ctx) => {
