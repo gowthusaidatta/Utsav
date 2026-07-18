@@ -123,7 +123,7 @@ function Consent() {
           </p>
           {scopes.length > 0 && (
             <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
-              {scopes.map((s) => (
+              {scopes.map((s: string) => (
                 <li key={s}>
                   {s === "openid" || s === "profile"
                     ? "Share your basic profile"
