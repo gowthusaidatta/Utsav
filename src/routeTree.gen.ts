@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
+import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedMyRegistrationsRouteImport } from './routes/_authenticated/my-registrations'
@@ -68,6 +69,11 @@ const IndexRoute = IndexRouteImport.update({
 const EventsIndexRoute = EventsIndexRouteImport.update({
   id: '/events/',
   path: '/events/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyCodeRoute = VerifyCodeRouteImport.update({
+  id: '/verify/$code',
+  path: '/verify/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsSlugRoute = EventsSlugRouteImport.update({
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/events/': typeof EventsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/events': typeof EventsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/_authenticated/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/events/': typeof EventsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -277,6 +286,7 @@ export interface FileRouteTypes {
     | '/my-registrations'
     | '/profile'
     | '/events/$slug'
+    | '/verify/$code'
     | '/events/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/my-registrations'
     | '/profile'
     | '/events/$slug'
+    | '/verify/$code'
     | '/events'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-registrations'
     | '/_authenticated/profile'
     | '/events/$slug'
+    | '/verify/$code'
     | '/events/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -356,6 +368,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   EventsSlugRoute: typeof EventsSlugRoute
+  VerifyCodeRoute: typeof VerifyCodeRoute
   EventsIndexRoute: typeof EventsIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -410,6 +423,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/events/'
       preLoaderRoute: typeof EventsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify/$code': {
+      id: '/verify/$code'
+      path: '/verify/$code'
+      fullPath: '/verify/$code'
+      preLoaderRoute: typeof VerifyCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/$slug': {
@@ -611,6 +631,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   EventsSlugRoute: EventsSlugRoute,
+  VerifyCodeRoute: VerifyCodeRoute,
   EventsIndexRoute: EventsIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
