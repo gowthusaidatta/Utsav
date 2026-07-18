@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard } from "lucide-react";
+import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket } from "lucide-react";
 
 export function Header() {
   const { user, loading } = useSession();
