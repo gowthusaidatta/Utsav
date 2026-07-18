@@ -119,14 +119,17 @@ function EventDetail() {
       </Card>
 
       <div className="mt-8 flex gap-3">
-        <Button size="lg">Register</Button>
-        <Button size="lg" variant="outline">
+        <Link
+          to="/events/$slug/register"
+          params={{ slug: e.slug }}
+          className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 text-base font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+        >
+          Register
+        </Link>
+        <Button size="lg" variant="outline" onClick={() => navigator.share?.({ title: e.title, url: window.location.href }).catch(() => {})}>
           Share
         </Button>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">
-        Registration flow ships in the next module.
-      </p>
     </main>
   );
 }
