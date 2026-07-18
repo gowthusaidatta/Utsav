@@ -1,0 +1,263 @@
+{
+  "version": 1,
+  "sdk_version": "0.23.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ruwiiaylxitqpsmufwvl.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "utsav-mcp",
+      "version": "0.1.0",
+      "title": "Utsav"
+    },
+    "tools": [
+      {
+        "name": "whoami",
+        "title": "Who am I",
+        "description": "Return the signed-in Utsav user's id, email, full name, and global roles.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_events",
+        "title": "List events",
+        "description": "List Utsav events visible to the signed-in user. Filter by status, category, or a text query on title/description.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "pending_approval",
+                "published",
+                "cancelled",
+                "completed",
+                "archived"
+              ],
+              "description": "Filter by event status."
+            },
+            "category": {
+              "type": "string",
+              "maxLength": 64,
+              "description": "Filter by category."
+            },
+            "query": {
+              "type": "string",
+              "maxLength": 120,
+              "description": "Text search on title/description."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Max rows (default 25)."
+            },
+            "mine_only": {
+              "type": "boolean",
+              "description": "Only events the caller created."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_event",
+        "title": "Get event",
+        "description": "Fetch a single Utsav event by id or slug. Access follows RLS.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Event id (UUID)."
+            },
+            "slug": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160,
+              "description": "Event slug."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_event_draft",
+        "title": "Create event draft",
+        "description": "Create a new Utsav event as a draft owned by the signed-in user. Use `change_event_status` to submit for approval or publish.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 160
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 10000
+            },
+            "category": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "start_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 start time."
+            },
+            "end_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 end time."
+            },
+            "venue": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "is_online": {
+              "type": "boolean"
+            },
+            "meeting_url": {
+              "type": "string",
+              "format": "uri",
+              "maxLength": 500
+            },
+            "capacity": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 1000000
+            },
+            "is_paid": {
+              "type": "boolean"
+            },
+            "price": {
+              "type": "number",
+              "minimum": 0
+            },
+            "currency": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 3
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "change_event_status",
+        "title": "Change event status",
+        "description": "Move an Utsav event through its lifecycle (draft → pending_approval → published, cancel, complete, archive). Server enforces role and transition rules.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "to": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "pending_approval",
+                "published",
+                "cancelled",
+                "completed",
+                "archived"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "required": [
+            "id",
+            "to"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_registrations",
+        "title": "List my registrations",
+        "description": "List the signed-in user's event registrations, including team and status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "confirmed",
+                "waitlisted",
+                "cancelled",
+                "checked_in"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
