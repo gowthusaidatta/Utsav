@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "Profile — EventGo" }] }),
+  head: () => ({ meta: [{ title: "Profile — Utsav" }] }),
   component: ProfilePage,
 });
 

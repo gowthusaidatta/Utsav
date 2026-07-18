@@ -92,7 +92,7 @@ function AuthPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-10">
       <Link to="/" className="mb-6 flex items-center gap-2 font-semibold">
-        <CalendarDays className="h-5 w-5 text-primary" /> EventGo
+        <CalendarDays className="h-5 w-5 text-primary" /> Utsav
       </Link>
       <Card className="w-full max-w-md">
         <CardHeader>
@@ -100,7 +100,7 @@ function AuthPage() {
           <CardDescription>
             {isSignup
               ? "Sign up to organize or join events."
-              : "Sign in to continue to EventGo."}
+              : "Sign in to continue to Utsav."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -176,7 +176,7 @@ function AuthPage() {
               </>
             ) : (
               <>
-                New to EventGo?{" "}
+                New to Utsav?{" "}
                 <Link to="/auth" search={{ mode: "signup" }} className="underline">
                   Create an account
                 </Link>

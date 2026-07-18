@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ShieldCheck, User } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — EventGo" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Utsav" }] }),
   component: Dashboard,
 });
 
@@ -28,7 +28,7 @@ function Dashboard() {
         <h1 className="text-2xl font-bold tracking-tight">
           Welcome{profile.data?.full_name ? `, ${profile.data.full_name}` : ""}
         </h1>
-        <p className="text-sm text-muted-foreground">Your EventGo dashboard.</p>
+        <p className="text-sm text-muted-foreground">Your Utsav dashboard.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
