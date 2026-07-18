@@ -90,6 +90,19 @@ function AuthPage() {
       toast.error(parsed.error.issues[0]?.message ?? "Invalid input");
       return;
     }
+    if (isSignup) {
+      // Client-side identity validation per role. Server also re-checks on approval.
+      if (desiredRole === "student" || desiredRole === "student_coordinator") {
+        if (!rollNumber.trim()) return toast.error("Roll number is required");
+        if (!college.trim() || !department.trim())
+          return toast.error("College and department are required");
+      }
+      if (desiredRole === "faculty" || desiredRole === "coordinator") {
+        if (!facultyId.trim()) return toast.error("Faculty ID is required");
+        if (!college.trim() || !department.trim())
+          return toast.error("College and department are required");
+      }
+    }
     setBusy(true);
     try {
       if (isSignup) {
@@ -98,17 +111,37 @@ function AuthPage() {
           password: parsed.data.password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth`,
-            data: { full_name: parsed.data.fullName },
+            data: {
+              full_name: parsed.data.fullName,
+              phone: phone.trim() || undefined,
+              college: college.trim() || undefined,
+              department: department.trim() || undefined,
+              roll_number: rollNumber.trim() || undefined,
+              faculty_id: facultyId.trim() || undefined,
+              academic_year: academicYear.trim() || undefined,
+              section: section.trim() || undefined,
+              designation: designation.trim() || undefined,
+              desired_role: desiredRole,
+            },
           },
         });
         if (error) throw error;
-        // If email confirmation is required, no session is returned — stay on /auth.
         if (!data.session) {
-          toast.success("Account created. Check your email to confirm and sign in.");
+          const needsApproval =
+            desiredRole !== "student" && desiredRole !== "guest";
+          toast.success(
+            needsApproval
+              ? "Account created. Your role requires admin approval — check your email to confirm sign-in first."
+              : "Account created. Check your email to confirm and sign in.",
+          );
           setBusy(false);
           return;
         }
-        toast.success("Account created.");
+        toast.success(
+          desiredRole === "student" || desiredRole === "guest"
+            ? "Account created."
+            : "Account created. Your elevated role is pending admin approval.",
+        );
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: parsed.data.email,
