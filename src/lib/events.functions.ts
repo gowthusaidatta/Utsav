@@ -226,10 +226,13 @@ export const updateEvent = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { id, ...patch } = data;
-    const update: Record<string, unknown> = { ...patch };
-    if (patch.status === "published") update.published_at = new Date().toISOString();
+    const update = {
+      ...patch,
+      ...(patch.status === "published" ? { published_at: new Date().toISOString() } : {}),
+    };
 
     const { error } = await context.supabase.from("events").update(update).eq("id", id);
+    if (error) throw new Error(error.message);
     if (error) throw new Error(error.message);
 
     await context.supabase.from("audit_logs").insert({
