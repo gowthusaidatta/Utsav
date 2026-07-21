@@ -277,9 +277,17 @@ export const createEvent = createServerFn({ method: "POST" })
         currency: data.currency ?? "INR",
         organization_id: data.organization_id ?? null,
         created_by: context.userId,
+        registration_type: data.registration_type ?? "individual",
+        min_team_size: data.min_team_size ?? null,
+        max_team_size: data.max_team_size ?? null,
+        max_teams: data.max_teams ?? null,
+        team_config: data.team_config ?? {},
+        attendance_rule: data.attendance_rule ?? "member",
+        certificate_rule: data.certificate_rule ?? "attended",
       })
       .select("id, slug")
       .single();
+
     if (error) throw new Error(error.message);
 
     await context.supabase.from("audit_logs").insert({
