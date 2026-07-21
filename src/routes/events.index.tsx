@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Sparkles, Search } from "lucide-react";
+import { BackBar } from "@/components/BackBar";
 
 const searchSchema = z.object({
   q: z.string().trim().max(120).optional().catch(undefined),
