@@ -27,6 +27,7 @@ import {
   MapPin,
   Clock,
 } from "lucide-react";
+import utsavBanner from "@/assets/utsav-banner.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
