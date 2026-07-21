@@ -1227,7 +1227,7 @@
       {
         "name": "reject_registration",
         "title": "Reject registration",
-        "description": "Cancel a registration (staff action). Requires manage-teams permission.",
+        "description": "Cancel a registration (staff action). Requires manage-teams permission on the event.",
         "annotations": {
           "readOnlyHint": false,
           "destructiveHint": true,
