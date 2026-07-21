@@ -246,6 +246,37 @@ function EventDetail() {
         </Card>
       )}
 
+      {(links.data ?? []).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <LinkIcon className="h-4 w-4 text-primary" /> Related links
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="divide-y">
+              {links.data!.map((l) => (
+                <li key={l.id} className="py-3">
+                  <a
+                    href={l.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    {l.title}
+                  </a>
+                  {l.description && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {l.description}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       <EventFeedback eventId={e.id} canReview={!!uid} />
     </main>
     </>
