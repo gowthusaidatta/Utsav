@@ -87,7 +87,15 @@ const upsertSchema = z.object({
   price: z.number().min(0).max(10_000_000).optional(),
   currency: z.string().trim().length(3).optional(),
   organization_id: z.string().uuid().optional().nullable(),
+  registration_type: z.enum(["individual", "team"]).optional(),
+  min_team_size: z.number().int().min(2).max(100).optional().nullable(),
+  max_team_size: z.number().int().min(2).max(100).optional().nullable(),
+  max_teams: z.number().int().min(1).max(10_000).optional().nullable(),
+  team_config: z.record(z.string(), z.unknown()).optional(),
+  attendance_rule: z.enum(["member", "leader", "all_members", "any_member"]).optional(),
+  certificate_rule: z.enum(["attended", "registered", "winners", "top_performers", "custom"]).optional(),
 });
+
 
 // -------------------------------------------------------------------
 // listPublicEvents — SSR-safe, published + public only
