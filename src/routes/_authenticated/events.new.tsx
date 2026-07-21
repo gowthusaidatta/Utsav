@@ -29,10 +29,21 @@ function NewEvent() {
     is_online: false,
     is_paid: false,
     price: "",
+    registration_type: "individual" as "individual" | "team",
+    min_team_size: "2",
+    max_team_size: "4",
+    max_teams: "",
+    attendance_rule: "member" as "member" | "leader" | "all_members" | "any_member",
   });
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (form.registration_type === "team") {
+      const min = Number(form.min_team_size);
+      const max = Number(form.max_team_size);
+      if (!(min >= 2)) return toast.error("Minimum team size must be at least 2");
+      if (!(max >= min)) return toast.error("Max team size must be ≥ min");
+    }
     setBusy(true);
     try {
       const payload = {
@@ -46,6 +57,11 @@ function NewEvent() {
         is_online: form.is_online,
         is_paid: form.is_paid,
         price: form.is_paid && form.price ? Number(form.price) : 0,
+        registration_type: form.registration_type,
+        min_team_size: form.registration_type === "team" ? Number(form.min_team_size) : undefined,
+        max_team_size: form.registration_type === "team" ? Number(form.max_team_size) : undefined,
+        max_teams: form.registration_type === "team" && form.max_teams ? Number(form.max_teams) : undefined,
+        attendance_rule: form.attendance_rule,
       };
       const res = await fn({ data: payload });
       toast.success("Event created as draft");
@@ -56,6 +72,7 @@ function NewEvent() {
       setBusy(false);
     }
   }
+
 
   return (
     <main className="container mx-auto max-w-2xl px-4 py-8">
