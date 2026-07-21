@@ -45,12 +45,15 @@ export const Route = createFileRoute("/events/$slug")({
     return { meta };
   },
   notFoundComponent: () => (
-    <main className="container mx-auto px-4 py-16 text-center">
-      <h1 className="text-2xl font-bold">Event not found</h1>
-      <p className="mt-2 text-muted-foreground">
-        This event doesn't exist, isn't published, or is private.
-      </p>
-    </main>
+    <>
+      <BackBar />
+      <main className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold">Event not found</h1>
+        <p className="mt-2 text-muted-foreground">
+          This event doesn't exist, isn't published, or is private.
+        </p>
+      </main>
+    </>
   ),
   component: EventDetail,
 });
