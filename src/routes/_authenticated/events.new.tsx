@@ -22,6 +22,32 @@ const COVER_ACCEPT = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 function NewEvent() {
   const router = useRouter();
   const fn = useServerFn(createEvent);
+  const updateFn = useServerFn(updateEvent);
+  const [busy, setBusy] = useState(false);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string>("");
+  const [drag, setDrag] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  function pickCover(file: File) {
+    if (!COVER_ACCEPT.includes(file.type)) {
+      toast.error("Use a JPG, PNG, WebP, or AVIF image");
+      return;
+    }
+    if (file.size > COVER_MAX_MB * 1024 * 1024) {
+      toast.error(`Image must be under ${COVER_MAX_MB} MB`);
+      return;
+    }
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
+  }
+
+  function clearCover() {
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+    setCoverFile(null);
+    setCoverPreview("");
+  }
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
     title: "",
