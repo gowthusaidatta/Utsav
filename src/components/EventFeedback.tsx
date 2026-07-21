@@ -22,17 +22,15 @@ interface Props {
 function Stars({
   value,
   onChange,
-  size = 5,
 }: {
   value: number;
   onChange?: (n: number) => void;
-  size?: number;
 }) {
   return (
     <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((n) => {
         const filled = n <= value;
-        const cls = `h-${size} w-${size} ${filled ? "fill-primary text-primary" : "text-muted-foreground"}`;
+        const cls = `h-4 w-4 ${filled ? "fill-primary text-primary" : "text-muted-foreground"}`;
         return onChange ? (
           <button key={n} type="button" onClick={() => onChange(n)} aria-label={`${n} star`}>
             <Star className={cls} />
