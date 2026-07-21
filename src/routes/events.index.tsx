@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Sparkles, Search } from "lucide-react";
+import { BackBar } from "@/components/BackBar";
 
 const searchSchema = z.object({
   q: z.string().trim().max(120).optional().catch(undefined),
@@ -76,6 +77,8 @@ function EventsIndex() {
   }
 
   return (
+    <>
+    <BackBar />
     <main className="container mx-auto px-4 py-10">
       <header className="mb-8 space-y-2">
         <div className="inline-flex items-center gap-2 rounded-full border bg-secondary/40 px-3 py-1 text-xs text-muted-foreground">
@@ -178,5 +181,6 @@ function EventsIndex() {
         </div>
       )}
     </main>
+    </>
   );
 }

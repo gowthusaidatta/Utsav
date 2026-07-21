@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin, Users, IndianRupee, Globe } from "lucide-react";
+import { BackBar } from "@/components/BackBar";
 
 const eventBySlug = (slug: string) =>
   queryOptions({
@@ -44,12 +45,15 @@ export const Route = createFileRoute("/events/$slug")({
     return { meta };
   },
   notFoundComponent: () => (
-    <main className="container mx-auto px-4 py-16 text-center">
-      <h1 className="text-2xl font-bold">Event not found</h1>
-      <p className="mt-2 text-muted-foreground">
-        This event doesn't exist, isn't published, or is private.
-      </p>
-    </main>
+    <>
+      <BackBar />
+      <main className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold">Event not found</h1>
+        <p className="mt-2 text-muted-foreground">
+          This event doesn't exist, isn't published, or is private.
+        </p>
+      </main>
+    </>
   ),
   component: EventDetail,
 });
@@ -72,6 +76,8 @@ function EventDetail() {
   if (!e) return null;
 
   return (
+    <>
+    <BackBar />
     <main className="container mx-auto max-w-4xl px-4 py-10">
       {e.cover_image_url && (
         <div className="mb-6 aspect-[16/7] overflow-hidden rounded-2xl bg-muted">
@@ -131,6 +137,7 @@ function EventDetail() {
         </Button>
       </div>
     </main>
+    </>
   );
 }
 
