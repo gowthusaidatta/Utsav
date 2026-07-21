@@ -67,13 +67,14 @@ export function EventFeedback({ eventId, canReview }: Props) {
 
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>("");
-  const initialized = useState(false);
-  // Sync form once when user's feedback loads
-  if (canReview && mine.data && !initialized[0]) {
-    setRating(mine.data.rating);
-    setComment(mine.data.comment ?? "");
-    initialized[1](true);
-  }
+  const [initialized, setInitialized] = useState(false);
+  useEffect(() => {
+    if (canReview && mine.data && !initialized) {
+      setRating(mine.data.rating);
+      setComment(mine.data.comment ?? "");
+      setInitialized(true);
+    }
+  }, [canReview, mine.data, initialized]);
 
   const save = useMutation({
     mutationFn: () =>
