@@ -1,5 +1,3 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import QRCode from "qrcode";
 import { createHmac, randomBytes } from "node:crypto";
 
 function certSecret(): string {
