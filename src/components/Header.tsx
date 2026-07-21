@@ -47,6 +47,7 @@ export function Header() {
           <span>Utsav</span>
         </Link>
         <nav className="flex items-center gap-2">
+          <ThemeToggle />
           {loading ? null : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
