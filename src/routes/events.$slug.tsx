@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin, Users, IndianRupee, Globe } from "lucide-react";
+import { BackBar } from "@/components/BackBar";
 
 const eventBySlug = (slug: string) =>
   queryOptions({
