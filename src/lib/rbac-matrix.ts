@@ -1,6 +1,6 @@
-// Utsav RBAC — 16-role permission matrix (SOURCE OF TRUTH mirrored in SQL `public.can()`).
-// Keep this file in sync with the migration that rewrites can(); breaking either side
-// silently mis-authorizes users, so update both in the same change.
+// Utsav RBAC — role metadata for UI. The permission catalog itself now lives in the
+// database (`public.role_permissions`) and is fetched via `listPermissionCatalog`.
+// Keep role labels and descriptions here so they stay under version control.
 
 export const APP_ROLES = [
   "super_admin",
@@ -10,19 +10,26 @@ export const APP_ROLES = [
   "college_admin",
   "dept_admin",
   "faculty",
-  "organizer",
   "coordinator",
-  "volunteer",
+  "student_coordinator",
+  "organizer",
   "judge",
   "mentor",
-  "sponsor",
   "finance",
   "media",
+  "sponsor",
+  "volunteer",
   "student",
 ] as const;
 export type AppRole = (typeof APP_ROLES)[number];
 
-// Guest is unauthenticated — no stored role. Listed for docs/UI only.
+// Platform admins bypass every check in `public.can()`.
+export const PLATFORM_ADMIN_ROLES: readonly AppRole[] = [
+  "super_admin",
+  "admin",
+  "platform_admin",
+];
+
 export const ROLE_LABELS: Record<AppRole | "guest", string> = {
   super_admin: "Super Admin",
   platform_admin: "Platform Admin",
@@ -31,14 +38,15 @@ export const ROLE_LABELS: Record<AppRole | "guest", string> = {
   college_admin: "College Admin",
   dept_admin: "Department Admin",
   faculty: "Faculty",
-  organizer: "Organizer",
-  coordinator: "Coordinator",
+  coordinator: "Faculty Coordinator",
+  student_coordinator: "Student Coordinator",
+  organizer: "Event Organizer",
   volunteer: "Volunteer",
   judge: "Judge",
   mentor: "Mentor",
   sponsor: "Sponsor",
   finance: "Finance",
-  media: "Media",
+  media: "Media Manager",
   student: "Student",
   guest: "Guest (not signed in)",
 };
@@ -46,194 +54,77 @@ export const ROLE_LABELS: Record<AppRole | "guest", string> = {
 export const ROLE_DESCRIPTIONS: Record<AppRole | "guest", string> = {
   super_admin: "Highest-privilege platform operator. Bypasses all checks.",
   platform_admin: "Platform operator. Bypasses all checks.",
-  admin: "Platform administrator. Bypasses all checks.",
-  org_admin: "Manages an organization, its events and staff.",
-  college_admin: "Manages a college and its departments/events.",
-  dept_admin: "Manages a department's events and staff.",
-  faculty: "Approves/publishes events, oversees delivery.",
-  organizer: "Runs one or more events end-to-end.",
-  coordinator: "Coordinates staff and approves submissions for an event.",
-  volunteer: "Assists on-site; checks attendees in.",
-  judge: "Scores submissions for an event.",
-  mentor: "Guides teams on an event.",
-  sponsor: "Sponsor of an event; views sponsor-facing dashboards.",
-  finance: "Views revenue, payments, refunds, financial exports.",
-  media: "Manages media library (images, videos, documents).",
-  student: "Registers for events, joins teams, submits projects.",
-  guest: "Anonymous visitor. Browses only public events.",
+  admin: "Legacy platform admin. Bypasses all checks.",
+  org_admin: "Runs an organization, its events, finance, and staff.",
+  college_admin: "Runs a college and its departments and events.",
+  dept_admin: "Runs a department's events, staff, and approvals.",
+  faculty: "Approves accounts and events, publishes and audits delivery.",
+  coordinator: "Faculty coordinator: owns event lifecycle and certificate approvals.",
+  student_coordinator: "Student coordinator: assists coordinator with event ops.",
+  organizer: "Runs one or more events end-to-end within their scope.",
+  volunteer: "Assists on-site; performs QR / manual attendance check-in.",
+  judge: "Evaluates and scores submissions for a specific event.",
+  mentor: "Guides teams and shares mentoring resources on a specific event.",
+  sponsor: "Views sponsor-facing analytics and reports for their event.",
+  finance: "Handles revenue, payments, refunds, invoices, and financial exports.",
+  media: "Uploads, approves, and manages event media (images, video, docs).",
+  student: "Registers for events, joins teams, submits projects, earns certificates.",
+  guest: "Anonymous visitor. Sees only public events and certificate verification.",
 };
 
-// Actions used by `public.can()`. E = event-scoped (needs an event id).
-export const ACTIONS = [
-  "view_event",
-  "register",
-  "create_team",
-  "submit_project",
-  "create_event",
-  "edit_event",
-  "publish_event",
-  "manage_teams",
-  "approve_registration",
-  "score_submissions",
-  "check_in",
-  "issue_certificates",
-  "delete_event",
-  "manage_users",
-  "manage_organizations",
-  "view_finance",
-  "manage_media",
-  "mentor_teams",
-  "sponsor_view",
-  "view_audit_logs",
+// Cell types used by the matrix UI. Derived at render time from `role_permissions`.
+export type MatrixCell = "G" | "E" | "-";
+
+// Category → display label for the grouped matrix render.
+export const CATEGORY_LABELS: Record<string, string> = {
+  events: "Events",
+  registration: "Registration",
+  teams: "Teams",
+  projects: "Projects & Submissions",
+  attendance: "Attendance",
+  certificates: "Certificates",
+  users: "Users",
+  organizations: "Organizations",
+  finance: "Finance",
+  media: "Media",
+  notifications: "Notifications",
+  reports: "Reports & Analytics",
+  audit: "Audit",
+  settings: "Settings",
+};
+
+export const CATEGORY_ORDER = [
+  "events",
+  "registration",
+  "teams",
+  "projects",
+  "attendance",
+  "certificates",
+  "media",
+  "notifications",
+  "reports",
+  "finance",
+  "users",
+  "organizations",
+  "audit",
+  "settings",
 ] as const;
-export type Action = (typeof ACTIONS)[number];
 
-export const ACTION_LABELS: Record<Action, string> = {
-  view_event: "View event",
-  register: "Register for an event",
-  create_team: "Create a team",
-  submit_project: "Submit a project",
-  create_event: "Create event",
-  edit_event: "Edit event",
-  publish_event: "Publish event",
-  manage_teams: "Manage teams",
-  approve_registration: "Approve registrations",
-  score_submissions: "Score submissions",
-  check_in: "Check attendees in",
-  issue_certificates: "Issue certificates",
-  delete_event: "Delete event",
-  manage_users: "Manage users",
-  manage_organizations: "Manage organizations",
-  view_finance: "View finance",
-  manage_media: "Manage media library",
-  mentor_teams: "Mentor teams",
-  sponsor_view: "Sponsor dashboard",
-  view_audit_logs: "View audit logs",
-};
-
-// "G" = allowed at global scope; "E" = allowed only for scoped assignments on
-// the specific event; "-" = denied. Platform admins are pre-authorized in can()
-// so their column is "G" everywhere. Mirrors the SQL matrix exactly.
-type Cell = "G" | "E" | "-";
-export const MATRIX: Record<AppRole | "guest", Record<Action, Cell>> = {
-  super_admin:    all("G"),
-  platform_admin: all("G"),
-  admin:          all("G"),
-
-  org_admin: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "G", edit_event: "G", publish_event: "G",
-    manage_teams: "G", approve_registration: "G", score_submissions: "-",
-    check_in: "G", issue_certificates: "G", delete_event: "-",
-    manage_users: "-", manage_organizations: "G", view_finance: "G",
-    manage_media: "G", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "G",
+// Compute a matrix cell for (role, permission-row) given the DB catalog.
+export function cellFor(
+  role: AppRole | "guest",
+  row: {
+    global_roles: string[];
+    event_roles: string[];
+    is_public: boolean;
+    is_self_service: boolean;
   },
-  college_admin: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "G", edit_event: "G", publish_event: "G",
-    manage_teams: "G", approve_registration: "G", score_submissions: "-",
-    check_in: "G", issue_certificates: "G", delete_event: "-",
-    manage_users: "-", manage_organizations: "G", view_finance: "-",
-    manage_media: "G", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "G",
-  },
-  dept_admin: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "G", edit_event: "G", publish_event: "G",
-    manage_teams: "G", approve_registration: "G", score_submissions: "-",
-    check_in: "G", issue_certificates: "G", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "G", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "-",
-  },
-  faculty: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "G", edit_event: "G", publish_event: "G",
-    manage_teams: "G", approve_registration: "G", score_submissions: "-",
-    check_in: "G", issue_certificates: "G", delete_event: "G",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "G", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "G",
-  },
-  organizer: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "G", edit_event: "E", publish_event: "-",
-    manage_teams: "E", approve_registration: "E", score_submissions: "-",
-    check_in: "E", issue_certificates: "-", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "E", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "-",
-  },
-  coordinator: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "G", edit_event: "E", publish_event: "E",
-    manage_teams: "E", approve_registration: "E", score_submissions: "-",
-    check_in: "E", issue_certificates: "E", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "E", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "-",
-  },
-  volunteer: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "-", edit_event: "-", publish_event: "-",
-    manage_teams: "-", approve_registration: "-", score_submissions: "-",
-    check_in: "E", issue_certificates: "-", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "-", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "-",
-  },
-  judge: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "-", edit_event: "-", publish_event: "-",
-    manage_teams: "-", approve_registration: "-", score_submissions: "E",
-    check_in: "-", issue_certificates: "-", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "-", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "-",
-  },
-  mentor: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "-", edit_event: "-", publish_event: "-",
-    manage_teams: "-", approve_registration: "-", score_submissions: "-",
-    check_in: "-", issue_certificates: "-", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "-", mentor_teams: "E", sponsor_view: "-", view_audit_logs: "-",
-  },
-  sponsor: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "-", edit_event: "-", publish_event: "-",
-    manage_teams: "-", approve_registration: "-", score_submissions: "-",
-    check_in: "-", issue_certificates: "-", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "-", mentor_teams: "-", sponsor_view: "G", view_audit_logs: "-",
-  },
-  finance: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "-", edit_event: "-", publish_event: "-",
-    manage_teams: "-", approve_registration: "-", score_submissions: "-",
-    check_in: "-", issue_certificates: "-", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "G",
-    manage_media: "-", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "-",
-  },
-  media: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "-", edit_event: "-", publish_event: "-",
-    manage_teams: "-", approve_registration: "-", score_submissions: "-",
-    check_in: "-", issue_certificates: "-", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "G", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "-",
-  },
-  student: {
-    view_event: "G", register: "G", create_team: "G", submit_project: "G",
-    create_event: "-", edit_event: "-", publish_event: "-",
-    manage_teams: "-", approve_registration: "-", score_submissions: "-",
-    check_in: "-", issue_certificates: "-", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "-", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "-",
-  },
-  guest: {
-    view_event: "G", register: "-", create_team: "-", submit_project: "-",
-    create_event: "-", edit_event: "-", publish_event: "-",
-    manage_teams: "-", approve_registration: "-", score_submissions: "-",
-    check_in: "-", issue_certificates: "-", delete_event: "-",
-    manage_users: "-", manage_organizations: "-", view_finance: "-",
-    manage_media: "-", mentor_teams: "-", sponsor_view: "-", view_audit_logs: "-",
-  },
-};
-
-function all(v: Cell): Record<Action, Cell> {
-  return Object.fromEntries(ACTIONS.map((a) => [a, v])) as Record<Action, Cell>;
+): MatrixCell {
+  if (row.is_public) return "G";
+  if (role === "guest") return "-";
+  if ((PLATFORM_ADMIN_ROLES as readonly string[]).includes(role)) return "G";
+  if (row.is_self_service) return "G";
+  if (row.global_roles.includes(role)) return "G";
+  if (row.event_roles.includes(role)) return "E";
+  return "-";
 }

@@ -728,6 +728,39 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          action: string
+          category: string
+          event_roles: string[]
+          global_roles: string[]
+          is_public: boolean
+          is_self_service: boolean
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          category: string
+          event_roles?: string[]
+          global_roles?: string[]
+          is_public?: boolean
+          is_self_service?: boolean
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          category?: string
+          event_roles?: string[]
+          global_roles?: string[]
+          is_public?: boolean
+          is_self_service?: boolean
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       team_members: {
         Row: {
           id: string
