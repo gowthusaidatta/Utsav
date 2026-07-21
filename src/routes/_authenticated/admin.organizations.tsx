@@ -147,7 +147,13 @@ function OrganizationsPage() {
         </CardHeader>
         <CardContent className="overflow-x-auto">
           {orgs.isError ? (
-            <p className="text-sm text-destructive">Failed to load organizations.</p>
+            <ErrorState title="Failed to load organizations" />
+          ) : (orgs.data ?? []).length === 0 && !orgs.isLoading ? (
+            <EmptyState
+              icon={<Building2 className="h-6 w-6" />}
+              title="No organizations yet"
+              description="Create the first organization above to start hosting events."
+            />
           ) : (
             <Table>
               <TableHeader>
@@ -180,19 +186,10 @@ function OrganizationsPage() {
                     </TableCell>
                   </TableRow>
                 ))}
-                {(orgs.data ?? []).length === 0 && !orgs.isLoading && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center text-sm text-muted-foreground"
-                    >
-                      No organizations yet.
-                    </TableCell>
-                  </TableRow>
-                )}
               </TableBody>
             </Table>
           )}
+
         </CardContent>
       </Card>
     </main>
