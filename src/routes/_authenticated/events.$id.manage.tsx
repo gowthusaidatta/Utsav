@@ -310,10 +310,10 @@ function ManageEvent() {
               <Button
                 size="sm"
                 variant="destructive"
-                onClick={() => transition("cancelled", "Cancel this event?")}
+                onClick={cancel}
                 disabled={busy}
               >
-                <XCircle className="mr-2 h-4 w-4" /> Cancel event
+                <Ban className="mr-2 h-4 w-4" /> Cancel event
               </Button>
             </>
           )}
