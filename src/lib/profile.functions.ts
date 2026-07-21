@@ -98,12 +98,13 @@ export const updateMyProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => profilePatchSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const patch = Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined));
+    const patch: Record<string, unknown> = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== undefined),
+    );
     if (Object.keys(patch).length === 0) return { ok: true };
-    const { error } = await context.supabase
-      .from("profiles")
-      .update(patch)
-      .eq("id", context.userId);
+    const { error } = await (context.supabase.from("profiles") as unknown as {
+      update: (p: Record<string, unknown>) => { eq: (c: string, v: string) => Promise<{ error: { message: string } | null }> };
+    }).update(patch).eq("id", context.userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
