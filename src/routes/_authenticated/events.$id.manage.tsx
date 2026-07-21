@@ -471,6 +471,9 @@ function ManageEvent() {
           </form>
         </CardContent>
       </Card>
+
+      <ManageAnnouncements eventId={id} />
+      <ManageFaqs eventId={id} />
     </main>
   );
 }
