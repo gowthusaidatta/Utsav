@@ -76,6 +76,8 @@ function EventDetail() {
   if (!e) return null;
 
   return (
+    <>
+    <BackBar />
     <main className="container mx-auto max-w-4xl px-4 py-10">
       {e.cover_image_url && (
         <div className="mb-6 aspect-[16/7] overflow-hidden rounded-2xl bg-muted">
