@@ -364,9 +364,59 @@ export type Database = {
           },
         ]
       }
+      event_links: {
+        Row: {
+          click_count: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_id: string
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          click_count?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id: string
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          click_count?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id?: string
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_links_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           attendance_rule: string
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           capacity: number | null
           category: string | null
           certificate_rule: string
@@ -374,6 +424,9 @@ export type Database = {
           created_at: string
           created_by: string
           currency: string
+          delete_reason: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           end_at: string | null
           id: string
@@ -402,6 +455,9 @@ export type Database = {
         }
         Insert: {
           attendance_rule?: string
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           capacity?: number | null
           category?: string | null
           certificate_rule?: string
@@ -409,6 +465,9 @@ export type Database = {
           created_at?: string
           created_by: string
           currency?: string
+          delete_reason?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           end_at?: string | null
           id?: string
@@ -437,6 +496,9 @@ export type Database = {
         }
         Update: {
           attendance_rule?: string
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           capacity?: number | null
           category?: string | null
           certificate_rule?: string
@@ -444,6 +506,9 @@ export type Database = {
           created_at?: string
           created_by?: string
           currency?: string
+          delete_reason?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           end_at?: string | null
           id?: string

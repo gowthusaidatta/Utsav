@@ -36,10 +36,12 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminUserApprovalsRouteImport } from './routes/_authenticated/admin.user-approvals'
 import { Route as AuthenticatedAdminRoleMatrixRouteImport } from './routes/_authenticated/admin.role-matrix'
 import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin.organizations'
+import { Route as AuthenticatedAdminDeletedEventsRouteImport } from './routes/_authenticated/admin.deleted-events'
 import { Route as AuthenticatedAdminDelegationsRouteImport } from './routes/_authenticated/admin.delegations'
 import { Route as AuthenticatedAdminApprovalsRouteImport } from './routes/_authenticated/admin.approvals'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as ApiPublicEventCoversSplatRouteImport } from './routes/api/public/event-covers.$'
 import { Route as AuthenticatedEventsSlugRegisterRouteImport } from './routes/_authenticated/events.$slug.register'
 import { Route as AuthenticatedEventsIdRegistrationsRouteImport } from './routes/_authenticated/events.$id.registrations'
 import { Route as AuthenticatedEventsIdManageRouteImport } from './routes/_authenticated/events.$id.manage'
@@ -189,6 +191,12 @@ const AuthenticatedAdminOrganizationsRoute =
     path: '/admin/organizations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminDeletedEventsRoute =
+  AuthenticatedAdminDeletedEventsRouteImport.update({
+    id: '/admin/deleted-events',
+    path: '/admin/deleted-events',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminDelegationsRoute =
   AuthenticatedAdminDelegationsRouteImport.update({
     id: '/admin/delegations',
@@ -212,6 +220,12 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicEventCoversSplatRoute =
+  ApiPublicEventCoversSplatRouteImport.update({
+    id: '/api/public/event-covers/$',
+    path: '/api/public/event-covers/$',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedEventsSlugRegisterRoute =
   AuthenticatedEventsSlugRegisterRouteImport.update({
     id: '/events/$slug/register',
@@ -268,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
+  '/admin/deleted-events': typeof AuthenticatedAdminDeletedEventsRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/admin/role-matrix': typeof AuthenticatedAdminRoleMatrixRoute
   '/admin/user-approvals': typeof AuthenticatedAdminUserApprovalsRoute
@@ -279,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
   '/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
+  '/api/public/event-covers/$': typeof ApiPublicEventCoversSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -305,6 +321,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
+  '/admin/deleted-events': typeof AuthenticatedAdminDeletedEventsRoute
   '/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/admin/role-matrix': typeof AuthenticatedAdminRoleMatrixRoute
   '/admin/user-approvals': typeof AuthenticatedAdminUserApprovalsRoute
@@ -316,6 +333,7 @@ export interface FileRoutesByTo {
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
   '/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
+  '/api/public/event-covers/$': typeof ApiPublicEventCoversSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -344,6 +362,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
   '/_authenticated/admin/delegations': typeof AuthenticatedAdminDelegationsRoute
+  '/_authenticated/admin/deleted-events': typeof AuthenticatedAdminDeletedEventsRoute
   '/_authenticated/admin/organizations': typeof AuthenticatedAdminOrganizationsRouteWithChildren
   '/_authenticated/admin/role-matrix': typeof AuthenticatedAdminRoleMatrixRoute
   '/_authenticated/admin/user-approvals': typeof AuthenticatedAdminUserApprovalsRoute
@@ -355,6 +374,7 @@ export interface FileRoutesById {
   '/_authenticated/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
   '/_authenticated/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/_authenticated/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
+  '/api/public/event-covers/$': typeof ApiPublicEventCoversSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -383,6 +403,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/admin/approvals'
     | '/admin/delegations'
+    | '/admin/deleted-events'
     | '/admin/organizations'
     | '/admin/role-matrix'
     | '/admin/user-approvals'
@@ -394,6 +415,7 @@ export interface FileRouteTypes {
     | '/events/$id/manage'
     | '/events/$id/registrations'
     | '/events/$slug/register'
+    | '/api/public/event-covers/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -420,6 +442,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/admin/approvals'
     | '/admin/delegations'
+    | '/admin/deleted-events'
     | '/admin/organizations'
     | '/admin/role-matrix'
     | '/admin/user-approvals'
@@ -431,6 +454,7 @@ export interface FileRouteTypes {
     | '/events/$id/manage'
     | '/events/$id/registrations'
     | '/events/$slug/register'
+    | '/api/public/event-covers/$'
   id:
     | '__root__'
     | '/'
@@ -458,6 +482,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/approvals'
     | '/_authenticated/admin/delegations'
+    | '/_authenticated/admin/deleted-events'
     | '/_authenticated/admin/organizations'
     | '/_authenticated/admin/role-matrix'
     | '/_authenticated/admin/user-approvals'
@@ -469,6 +494,7 @@ export interface FileRouteTypes {
     | '/_authenticated/events/$id/manage'
     | '/_authenticated/events/$id/registrations'
     | '/_authenticated/events/$slug/register'
+    | '/api/public/event-covers/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -486,6 +512,7 @@ export interface RootRouteChildren {
   EventsIndexRoute: typeof EventsIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiPublicEventCoversSplatRoute: typeof ApiPublicEventCoversSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -679,6 +706,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOrganizationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/deleted-events': {
+      id: '/_authenticated/admin/deleted-events'
+      path: '/admin/deleted-events'
+      fullPath: '/admin/deleted-events'
+      preLoaderRoute: typeof AuthenticatedAdminDeletedEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/delegations': {
       id: '/_authenticated/admin/delegations'
       path: '/admin/delegations'
@@ -705,6 +739,13 @@ declare module '@tanstack/react-router' {
       path: '/.lovable/oauth/consent'
       fullPath: '/.lovable/oauth/consent'
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/event-covers/$': {
+      id: '/api/public/event-covers/$'
+      path: '/api/public/event-covers/$'
+      fullPath: '/api/public/event-covers/$'
+      preLoaderRoute: typeof ApiPublicEventCoversSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/events/$slug/register': {
@@ -772,6 +813,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRoute
   AuthenticatedAdminDelegationsRoute: typeof AuthenticatedAdminDelegationsRoute
+  AuthenticatedAdminDeletedEventsRoute: typeof AuthenticatedAdminDeletedEventsRoute
   AuthenticatedAdminOrganizationsRoute: typeof AuthenticatedAdminOrganizationsRouteWithChildren
   AuthenticatedAdminRoleMatrixRoute: typeof AuthenticatedAdminRoleMatrixRoute
   AuthenticatedAdminUserApprovalsRoute: typeof AuthenticatedAdminUserApprovalsRoute
@@ -796,6 +838,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedAdminApprovalsRoute: AuthenticatedAdminApprovalsRoute,
   AuthenticatedAdminDelegationsRoute: AuthenticatedAdminDelegationsRoute,
+  AuthenticatedAdminDeletedEventsRoute: AuthenticatedAdminDeletedEventsRoute,
   AuthenticatedAdminOrganizationsRoute:
     AuthenticatedAdminOrganizationsRouteWithChildren,
   AuthenticatedAdminRoleMatrixRoute: AuthenticatedAdminRoleMatrixRoute,
@@ -829,17 +872,8 @@ const rootRouteChildren: RootRouteChildren = {
   EventsIndexRoute: EventsIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiPublicEventCoversSplatRoute: ApiPublicEventCoversSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

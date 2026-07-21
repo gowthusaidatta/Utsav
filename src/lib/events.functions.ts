@@ -70,7 +70,14 @@ function createServerPublicClient() {
 const upsertSchema = z.object({
   title: z.string().trim().min(3).max(160),
   description: z.string().trim().max(10_000).optional().nullable(),
-  cover_image_url: z.string().url().max(500).optional().nullable(),
+  cover_image_url: z
+    .string()
+    .max(500)
+    .refine((v) => v === "" || v.startsWith("/") || /^https?:\/\//.test(v), {
+      message: "Must be an absolute URL or a site-relative path",
+    })
+    .optional()
+    .nullable(),
   category: z.string().trim().max(64).optional().nullable(),
   tags: z.array(z.string().trim().min(1).max(32)).max(20).optional(),
   status: z.enum(eventStatuses).optional(),
@@ -448,18 +455,63 @@ export const changeEventStatus = createServerFn({ method: "POST" })
   });
 
 // -------------------------------------------------------------------
-// deleteEvent — faculty/admin (RLS enforces)
+// deleteEvent — SOFT delete (sets deleted_at). RLS enforces edit rights.
 // -------------------------------------------------------------------
 export const deleteEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .inputValidator((input) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        reason: z.string().trim().max(500).optional(),
+      })
+      .parse(input),
+  )
   .handler(async ({ data, context }) => {
     const meta = requestMeta();
-    const { error } = await context.supabase.from("events").delete().eq("id", data.id);
+    const { error } = await context.supabase
+      .from("events")
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: context.userId,
+        delete_reason: data.reason ?? null,
+      } as never)
+      .eq("id", data.id)
+      .is("deleted_at", null);
     if (error) throw new Error(error.message);
     await context.supabase.from("audit_logs").insert({
       actor_user_id: context.userId,
       action: "event.deleted",
+      resource_type: "events",
+      resource_id: data.id,
+      metadata: { reason: data.reason ?? null },
+      ip: meta.ip,
+      user_agent: meta.user_agent,
+    });
+    return { ok: true };
+  });
+
+// -------------------------------------------------------------------
+// restoreEvent — admin only. Clears deleted_at.
+// -------------------------------------------------------------------
+export const restoreEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: allowed } = await context.supabase.rpc("has_any_global_role", {
+      _uid: context.userId,
+      _roles: ["admin", "platform_admin", "super_admin"],
+    });
+    if (!allowed) throw new Error("Forbidden: platform admin only");
+    const { error } = await context.supabase
+      .from("events")
+      .update({ deleted_at: null, deleted_by: null, delete_reason: null } as never)
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    const meta = requestMeta();
+    await context.supabase.from("audit_logs").insert({
+      actor_user_id: context.userId,
+      action: "event.restored",
       resource_type: "events",
       resource_id: data.id,
       metadata: {},
@@ -467,6 +519,139 @@ export const deleteEvent = createServerFn({ method: "POST" })
       user_agent: meta.user_agent,
     });
     return { ok: true };
+  });
+
+// -------------------------------------------------------------------
+// purgeEvent — super admin only. Hard delete.
+// -------------------------------------------------------------------
+export const purgeEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: allowed } = await context.supabase.rpc("has_any_global_role", {
+      _uid: context.userId,
+      _roles: ["super_admin"],
+    });
+    if (!allowed) throw new Error("Forbidden: super admin only");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("events").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    const meta = requestMeta();
+    await context.supabase.from("audit_logs").insert({
+      actor_user_id: context.userId,
+      action: "event.purged",
+      resource_type: "events",
+      resource_id: data.id,
+      metadata: {},
+      ip: meta.ip,
+      user_agent: meta.user_agent,
+    });
+    return { ok: true };
+  });
+
+// -------------------------------------------------------------------
+// listDeletedEvents — platform admin only.
+// -------------------------------------------------------------------
+export const listDeletedEvents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: allowed } = await context.supabase.rpc("has_any_global_role", {
+      _uid: context.userId,
+      _roles: ["admin", "platform_admin", "super_admin"],
+    });
+    if (!allowed) throw new Error("Forbidden: platform admin only");
+    const { data, error } = await context.supabase
+      .from("events")
+      .select(
+        "id, title, slug, status, deleted_at, deleted_by, delete_reason, cover_image_url, created_by, created_at",
+      )
+      .not("deleted_at", "is", null)
+      .order("deleted_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+// -------------------------------------------------------------------
+// cancelEvent — proper cancellation with reason. Cancels active regs and
+// notifies affected users. Escalates via service role after permission check.
+// -------------------------------------------------------------------
+export const cancelEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        reason: z.string().trim().min(3).max(500),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    // Permission gate via user-scoped client (RLS applies).
+    const { data: current, error: fErr } = await context.supabase
+      .from("events")
+      .select("id, title, status, created_by")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (fErr) throw new Error(fErr.message);
+    if (!current) throw new Error("Event not found or access denied");
+    if (current.status === "cancelled") return { ok: true, already: true };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const nowIso = new Date().toISOString();
+
+    const { error: uErr } = await supabaseAdmin
+      .from("events")
+      .update({
+        status: "cancelled",
+        cancelled_at: nowIso,
+        cancelled_by: context.userId,
+        cancel_reason: data.reason,
+      } as never)
+      .eq("id", data.id);
+    if (uErr) throw new Error(uErr.message);
+
+    // Cancel active registrations.
+    const { data: regs } = await supabaseAdmin
+      .from("registrations")
+      .select("id, user_id")
+      .eq("event_id", data.id)
+      .in("status", ["registered", "checked_in"]);
+    const affectedUserIds = Array.from(new Set((regs ?? []).map((r) => r.user_id)));
+    if ((regs ?? []).length > 0) {
+      await supabaseAdmin
+        .from("registrations")
+        .update({ status: "cancelled" } as never)
+        .in("id", (regs ?? []).map((r) => r.id));
+    }
+
+    // Notify affected users.
+    if (affectedUserIds.length > 0) {
+      await supabaseAdmin.from("notifications").insert(
+        affectedUserIds.map((uid) => ({
+          recipient_user_id: uid,
+          sender_user_id: context.userId,
+          event_id: data.id,
+          channel: "in_app",
+          subject: `Event cancelled: ${current.title}`,
+          body: data.reason,
+          status: "sent",
+          sent_at: nowIso,
+        })) as never,
+      );
+    }
+
+    const meta = requestMeta();
+    await supabaseAdmin.from("audit_logs").insert({
+      actor_user_id: context.userId,
+      action: "event.cancelled",
+      resource_type: "events",
+      resource_id: data.id,
+      metadata: { reason: data.reason, affected_users: affectedUserIds.length },
+      ip: meta.ip,
+      user_agent: meta.user_agent,
+    });
+    return { ok: true, affected: affectedUserIds.length };
   });
 
 // -------------------------------------------------------------------

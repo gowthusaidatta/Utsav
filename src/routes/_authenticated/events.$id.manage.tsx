@@ -8,6 +8,7 @@ import {
   deleteEvent,
   changeEventStatus,
   duplicateEvent,
+  cancelEvent,
 } from "@/lib/events.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,8 +26,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Trash2, Copy, Send, CheckCircle2, XCircle, Archive } from "lucide-react";
+import { Trash2, Copy, Send, CheckCircle2, XCircle, Archive, Ban } from "lucide-react";
 import { ManageFaqs, ManageAnnouncements } from "@/components/ManageEventExtras";
+import { EventCoverUpload } from "@/components/EventCoverUpload";
+import { EventLinksEditor } from "@/components/EventLinksEditor";
 
 export const Route = createFileRoute("/_authenticated/events/$id/manage")({
   head: () => ({ meta: [{ title: "Manage Event — Utsav" }] }),
@@ -68,6 +71,7 @@ function ManageEvent() {
   const delFn = useServerFn(deleteEvent);
   const statusFn = useServerFn(changeEventStatus);
   const dupFn = useServerFn(duplicateEvent);
+  const cancelFn = useServerFn(cancelEvent);
 
   const q = useQuery({ queryKey: ["event", id], queryFn: () => getFn({ data: { id } }) });
 
@@ -171,13 +175,42 @@ function ManageEvent() {
   }
 
   async function remove() {
-    if (!window.confirm("Delete this event? This cannot be undone.")) return;
+    const reason = window.prompt(
+      "Delete this event? It will be soft-deleted and can be restored by an admin. Optional reason:",
+      "",
+    );
+    if (reason === null) return;
     try {
-      await delFn({ data: { id } });
+      await delFn({ data: { id, reason: reason || undefined } });
       toast.success("Event deleted");
       router.navigate({ to: "/my-events" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Delete failed");
+    }
+  }
+
+  async function cancel() {
+    const reason = window.prompt(
+      "Reason for cancelling? Registered attendees will be notified.",
+      "",
+    );
+    if (!reason || reason.trim().length < 3) {
+      if (reason !== null) toast.error("Reason must be at least 3 characters");
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await cancelFn({ data: { id, reason: reason.trim() } });
+      await qc.invalidateQueries({ queryKey: ["event", id] });
+      toast.success(
+        res.affected
+          ? `Event cancelled · ${res.affected} attendee${res.affected === 1 ? "" : "s"} notified`
+          : "Event cancelled",
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cancel failed");
+    } finally {
+      setBusy(false);
     }
   }
 
