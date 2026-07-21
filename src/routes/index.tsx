@@ -188,7 +188,15 @@ function Landing() {
       <main>
         {/* Hero + Search */}
         <section className="relative overflow-hidden bg-hero-gradient">
-          <div className="container mx-auto px-4 py-20 sm:py-28 lg:py-32">
+          <div className="container mx-auto px-4 py-16 sm:py-24 lg:py-28">
+            <div className="mx-auto mb-10 max-w-5xl overflow-hidden rounded-2xl border border-border shadow-[var(--shadow-elevated)]">
+              <img
+                src={utsavBanner.url}
+                alt="Utsav — Event Management Platform. Organize. Engage. Celebrate."
+                className="h-auto w-full"
+                loading="eager"
+              />
+            </div>
             <div className="mx-auto max-w-3xl text-center animate-fade-up">
               <Badge
                 variant="secondary"
