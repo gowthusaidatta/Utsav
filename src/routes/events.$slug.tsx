@@ -1,11 +1,25 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery, queryOptions } from "@tanstack/react-query";
 import { getEventBySlug } from "@/lib/events.functions";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  listEventFaqs,
+  listEventAnnouncements,
+} from "@/lib/event-extras.functions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin, Users, IndianRupee, Globe } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Calendar, Clock, MapPin, Users, IndianRupee, Globe, Megaphone, Pin } from "lucide-react";
 import { BackBar } from "@/components/BackBar";
+import { EventFeedback } from "@/components/EventFeedback";
+import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 const eventBySlug = (slug: string) =>
   queryOptions({
