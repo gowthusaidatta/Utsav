@@ -6,6 +6,8 @@ import { listMyDelegations, revokeDelegation } from "@/lib/authz.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/PageHeader";
+
 
 export const Route = createFileRoute("/_authenticated/delegations")({
   head: () => ({ meta: [{ title: "My delegations — Utsav" }] }),
