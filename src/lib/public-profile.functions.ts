@@ -26,11 +26,11 @@ function serverPublicClient() {
 export type PublicProfileResult =
   | { not_found: true; redirect_to: string | null }
   | { not_found: false; private: true; username: string }
-  | { not_found: false; private: false; profile: Record<string, unknown> };
+  | { not_found: false; private: false; profile: Json };
 
 export const getPublicProfile = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ username: z.string().trim().min(1).max(64) }).parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<PublicProfileResult> => {
     const supabase = serverPublicClient();
     const { data: rpc, error } = await supabase.rpc("get_public_profile", { _username: data.username });
     if (error) throw new Error(error.message);
