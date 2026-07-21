@@ -16,6 +16,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { PageHeader } from "@/components/PageHeader";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -31,15 +38,8 @@ type FormState = {
   gender: string;
   date_of_birth: string;
   bio: string;
-  nationality: string;
-  blood_group: string;
-  languages: string; // comma-separated in the input, split on save
-  address_country: string;
-  address_state: string;
-  address_district: string;
-  address_city: string;
-  address_postal_code: string;
-  timezone: string;
+  languages: string;
+  // academic (student-like)
   college: string;
   campus: string;
   department: string;
@@ -54,6 +54,7 @@ type FormState = {
   expected_graduation: string;
   student_id: string;
   admission_year: string;
+  // professional (faculty / staff / admin / organizer etc.)
   designation: string;
   current_position: string;
   organization_name: string;
@@ -63,6 +64,7 @@ type FormState = {
   resume_url: string;
   portfolio_url: string;
   personal_website: string;
+  // social
   linkedin_url: string;
   github_url: string;
   twitter_url: string;
@@ -81,9 +83,7 @@ type FormState = {
 
 const empty: FormState = {
   full_name: "", display_name: "", phone: "", alternate_phone: "", gender: "",
-  date_of_birth: "", bio: "", nationality: "", blood_group: "", languages: "",
-  address_country: "", address_state: "", address_district: "", address_city: "",
-  address_postal_code: "", timezone: "",
+  date_of_birth: "", bio: "", languages: "",
   college: "", campus: "", department: "", course: "", branch: "", specialization: "",
   registration_number: "", academic_year: "", section: "", semester: "", current_year: "",
   expected_graduation: "", student_id: "", admission_year: "",
@@ -96,6 +96,30 @@ const empty: FormState = {
   researchgate_url: "", orcid: "",
   profile_is_public: true,
 };
+
+const GENDER_OPTIONS = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "non_binary", label: "Non-binary" },
+  { value: "other", label: "Other" },
+  { value: "prefer_not_to_say", label: "Prefer not to say" },
+];
+
+// Role → which context tab to render
+const STUDENT_ROLES = new Set(["student", "student_coordinator", "volunteer", "guest"]);
+const FACULTY_ROLES = new Set(["faculty", "coordinator", "mentor", "judge"]);
+const ADMIN_ROLES = new Set([
+  "admin", "super_admin", "platform_admin", "org_admin",
+  "college_admin", "dept_admin", "organizer", "media", "sponsor", "finance",
+]);
+
+function roleContext(roles: string[] | undefined): "student" | "faculty" | "admin" {
+  const list = roles ?? [];
+  if (list.some((r) => ADMIN_ROLES.has(r))) return "admin";
+  if (list.some((r) => FACULTY_ROLES.has(r))) return "faculty";
+  if (list.some((r) => STUDENT_ROLES.has(r))) return "student";
+  return "student";
+}
 
 function csvToArray(s: string) {
   return s.split(",").map((x) => x.trim()).filter(Boolean);
@@ -112,6 +136,8 @@ function ProfilePage() {
   const [username, setUsername] = useState("");
   const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "ok" | "taken" | "invalid">("idle");
 
+  const ctx = roleContext((data as { roles?: string[] } | null)?.roles);
+
   useEffect(() => {
     if (!data) return;
     setUsername(data.username ?? "");
@@ -124,15 +150,7 @@ function ProfilePage() {
       gender: data.gender ?? "",
       date_of_birth: data.date_of_birth ?? "",
       bio: data.bio ?? "",
-      nationality: data.nationality ?? "",
-      blood_group: data.blood_group ?? "",
       languages: (data.languages ?? []).join(", "),
-      address_country: data.address_country ?? "",
-      address_state: data.address_state ?? "",
-      address_district: data.address_district ?? "",
-      address_city: data.address_city ?? "",
-      address_postal_code: data.address_postal_code ?? "",
-      timezone: data.timezone ?? "",
       college: data.college ?? "",
       campus: data.campus ?? "",
       department: data.department ?? "",
@@ -207,38 +225,38 @@ function ProfilePage() {
           gender: form.gender || null,
           date_of_birth: form.date_of_birth || null,
           bio: form.bio || null,
-          nationality: form.nationality || null,
-          blood_group: form.blood_group || null,
           languages: csvToArray(form.languages),
-          address_country: form.address_country || null,
-          address_state: form.address_state || null,
-          address_district: form.address_district || null,
-          address_city: form.address_city || null,
-          address_postal_code: form.address_postal_code || null,
-          timezone: form.timezone || null,
-          college: form.college || null,
-          campus: form.campus || null,
-          department: form.department || null,
-          course: form.course || null,
-          branch: form.branch || null,
-          specialization: form.specialization || null,
-          registration_number: form.registration_number || null,
-          academic_year: form.academic_year || null,
-          section: form.section || null,
-          semester: form.semester || null,
-          current_year: form.current_year || null,
-          expected_graduation: form.expected_graduation || null,
-          student_id: form.student_id || null,
-          admission_year: form.admission_year || null,
-          designation: form.designation || null,
-          current_position: form.current_position || null,
-          organization_name: form.organization_name || null,
-          experience_years: form.experience_years ? Number(form.experience_years) : null,
-          technical_skills: csvToArray(form.technical_skills),
-          soft_skills: csvToArray(form.soft_skills),
-          resume_url: form.resume_url || null,
-          portfolio_url: form.portfolio_url || null,
-          personal_website: form.personal_website || null,
+          // academic — only for student-like roles
+          ...(ctx === "student" ? {
+            college: form.college || null,
+            campus: form.campus || null,
+            department: form.department || null,
+            course: form.course || null,
+            branch: form.branch || null,
+            specialization: form.specialization || null,
+            registration_number: form.registration_number || null,
+            academic_year: form.academic_year || null,
+            section: form.section || null,
+            semester: form.semester || null,
+            current_year: form.current_year || null,
+            expected_graduation: form.expected_graduation || null,
+            student_id: form.student_id || null,
+            admission_year: form.admission_year || null,
+          } : {}),
+          // professional — for faculty/admin/staff
+          ...(ctx !== "student" ? {
+            college: form.college || null,
+            department: form.department || null,
+            designation: form.designation || null,
+            current_position: form.current_position || null,
+            organization_name: form.organization_name || null,
+            experience_years: form.experience_years ? Number(form.experience_years) : null,
+            technical_skills: csvToArray(form.technical_skills),
+            soft_skills: csvToArray(form.soft_skills),
+            resume_url: form.resume_url || null,
+            portfolio_url: form.portfolio_url || null,
+            personal_website: form.personal_website || null,
+          } : {}),
           linkedin_url: form.linkedin_url || null,
           github_url: form.github_url || null,
           twitter_url: form.twitter_url || null,
@@ -264,11 +282,15 @@ function ProfilePage() {
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
 
+  const contextTabValue = ctx === "student" ? "academic" : "professional";
+  const contextTabLabel =
+    ctx === "student" ? "Academic" : ctx === "faculty" ? "Faculty" : "Role details";
+
   return (
     <main className="container mx-auto max-w-4xl px-4 py-8 space-y-6">
       <PageHeader
         title="Profile"
-        subtitle="Manage your identity, academic, and professional details."
+        subtitle="Manage your identity and role details."
         actions={
           data?.username ? (
             <a
@@ -343,8 +365,7 @@ function ProfilePage() {
             <Tabs defaultValue="personal">
               <TabsList className="flex-wrap">
                 <TabsTrigger value="personal">Personal</TabsTrigger>
-                <TabsTrigger value="academic">Academic</TabsTrigger>
-                <TabsTrigger value="professional">Professional</TabsTrigger>
+                <TabsTrigger value={contextTabValue}>{contextTabLabel}</TabsTrigger>
                 <TabsTrigger value="social">Social & links</TabsTrigger>
               </TabsList>
 
@@ -355,67 +376,84 @@ function ProfilePage() {
                   <Field label="Email"><Input value={data?.email ?? ""} disabled /></Field>
                   <Field label="Phone"><Input value={form.phone} onChange={(e) => set("phone", e.target.value)} /></Field>
                   <Field label="Alternate phone"><Input value={form.alternate_phone} onChange={(e) => set("alternate_phone", e.target.value)} /></Field>
-                  <Field label="Gender"><Input value={form.gender} onChange={(e) => set("gender", e.target.value)} /></Field>
+                  <Field label="Gender">
+                    <Select value={form.gender || undefined} onValueChange={(v) => set("gender", v)}>
+                      <SelectTrigger><SelectValue placeholder="Select gender" /></SelectTrigger>
+                      <SelectContent>
+                        {GENDER_OPTIONS.map((o) => (
+                          <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
                   <Field label="Date of birth"><Input type="date" value={form.date_of_birth} onChange={(e) => set("date_of_birth", e.target.value)} /></Field>
-                  <Field label="Nationality"><Input value={form.nationality} onChange={(e) => set("nationality", e.target.value)} /></Field>
-                  <Field label="Blood group"><Input value={form.blood_group} onChange={(e) => set("blood_group", e.target.value)} /></Field>
                   <Field label="Languages (comma-separated)"><Input value={form.languages} onChange={(e) => set("languages", e.target.value)} /></Field>
                   <div className="sm:col-span-2">
                     <Field label="Bio"><Textarea rows={4} value={form.bio} onChange={(e) => set("bio", e.target.value)} maxLength={2000} /></Field>
                   </div>
-                  <Field label="Country"><Input value={form.address_country} onChange={(e) => set("address_country", e.target.value)} /></Field>
-                  <Field label="State"><Input value={form.address_state} onChange={(e) => set("address_state", e.target.value)} /></Field>
-                  <Field label="District"><Input value={form.address_district} onChange={(e) => set("address_district", e.target.value)} /></Field>
-                  <Field label="City"><Input value={form.address_city} onChange={(e) => set("address_city", e.target.value)} /></Field>
-                  <Field label="Postal code"><Input value={form.address_postal_code} onChange={(e) => set("address_postal_code", e.target.value)} /></Field>
-                  <Field label="Timezone"><Input value={form.timezone} onChange={(e) => set("timezone", e.target.value)} placeholder="e.g. Asia/Kolkata" /></Field>
                 </CardContent></Card>
               </TabsContent>
 
-              <TabsContent value="academic">
-                <Card><CardContent className="grid gap-3 pt-6 sm:grid-cols-2">
-                  <Field label="College"><Input value={form.college} onChange={(e) => set("college", e.target.value)} /></Field>
-                  <Field label="Campus"><Input value={form.campus} onChange={(e) => set("campus", e.target.value)} /></Field>
-                  <Field label="Department"><Input value={form.department} onChange={(e) => set("department", e.target.value)} /></Field>
-                  <Field label="Course"><Input value={form.course} onChange={(e) => set("course", e.target.value)} /></Field>
-                  <Field label="Branch"><Input value={form.branch} onChange={(e) => set("branch", e.target.value)} /></Field>
-                  <Field label="Specialization"><Input value={form.specialization} onChange={(e) => set("specialization", e.target.value)} /></Field>
-                  <Field label="Registration number"><Input value={form.registration_number} onChange={(e) => set("registration_number", e.target.value)} /></Field>
-                  <Field label="Student ID"><Input value={form.student_id} onChange={(e) => set("student_id", e.target.value)} /></Field>
-                  <Field label="Academic year"><Input value={form.academic_year} onChange={(e) => set("academic_year", e.target.value)} /></Field>
-                  <Field label="Current year"><Input value={form.current_year} onChange={(e) => set("current_year", e.target.value)} /></Field>
-                  <Field label="Section"><Input value={form.section} onChange={(e) => set("section", e.target.value)} /></Field>
-                  <Field label="Semester"><Input value={form.semester} onChange={(e) => set("semester", e.target.value)} /></Field>
-                  <Field label="Admission year"><Input value={form.admission_year} onChange={(e) => set("admission_year", e.target.value)} /></Field>
-                  <Field label="Expected graduation"><Input value={form.expected_graduation} onChange={(e) => set("expected_graduation", e.target.value)} placeholder="e.g. May 2027" /></Field>
-                  <div className="sm:col-span-2 text-xs text-muted-foreground">
-                    Manage detailed education history (school, college, PhD, certifications) on the{" "}
-                    <a className="text-primary hover:underline" href="/education">Education</a> page.
-                  </div>
-                </CardContent></Card>
-              </TabsContent>
+              {ctx === "student" && (
+                <TabsContent value="academic">
+                  <Card><CardContent className="grid gap-3 pt-6 sm:grid-cols-2">
+                    <Field label="College"><Input value={form.college} onChange={(e) => set("college", e.target.value)} /></Field>
+                    <Field label="Campus"><Input value={form.campus} onChange={(e) => set("campus", e.target.value)} /></Field>
+                    <Field label="Department"><Input value={form.department} onChange={(e) => set("department", e.target.value)} /></Field>
+                    <Field label="Course"><Input value={form.course} onChange={(e) => set("course", e.target.value)} /></Field>
+                    <Field label="Branch"><Input value={form.branch} onChange={(e) => set("branch", e.target.value)} /></Field>
+                    <Field label="Specialization"><Input value={form.specialization} onChange={(e) => set("specialization", e.target.value)} /></Field>
+                    <Field label="Registration number"><Input value={form.registration_number} onChange={(e) => set("registration_number", e.target.value)} /></Field>
+                    <Field label="Student ID"><Input value={form.student_id} onChange={(e) => set("student_id", e.target.value)} /></Field>
+                    <Field label="Academic year"><Input value={form.academic_year} onChange={(e) => set("academic_year", e.target.value)} /></Field>
+                    <Field label="Current year"><Input value={form.current_year} onChange={(e) => set("current_year", e.target.value)} /></Field>
+                    <Field label="Section"><Input value={form.section} onChange={(e) => set("section", e.target.value)} /></Field>
+                    <Field label="Semester"><Input value={form.semester} onChange={(e) => set("semester", e.target.value)} /></Field>
+                    <Field label="Admission year"><Input value={form.admission_year} onChange={(e) => set("admission_year", e.target.value)} /></Field>
+                    <Field label="Expected graduation"><Input value={form.expected_graduation} onChange={(e) => set("expected_graduation", e.target.value)} placeholder="e.g. May 2027" /></Field>
+                    <div className="sm:col-span-2 text-xs text-muted-foreground">
+                      Manage detailed education history on the{" "}
+                      <a className="text-primary hover:underline" href="/education">Education</a> page.
+                    </div>
+                  </CardContent></Card>
+                </TabsContent>
+              )}
 
-              <TabsContent value="professional">
-                <Card><CardContent className="grid gap-3 pt-6 sm:grid-cols-2">
-                  <Field label="Designation"><Input value={form.designation} onChange={(e) => set("designation", e.target.value)} /></Field>
-                  <Field label="Current position"><Input value={form.current_position} onChange={(e) => set("current_position", e.target.value)} /></Field>
-                  <Field label="Organization"><Input value={form.organization_name} onChange={(e) => set("organization_name", e.target.value)} /></Field>
-                  <Field label="Years of experience"><Input type="number" min={0} max={80} value={form.experience_years} onChange={(e) => set("experience_years", e.target.value)} /></Field>
-                  <div className="sm:col-span-2">
-                    <Field label="Technical skills (comma-separated)"><Input value={form.technical_skills} onChange={(e) => set("technical_skills", e.target.value)} placeholder="React, TypeScript, Python" /></Field>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <Field label="Soft skills (comma-separated)"><Input value={form.soft_skills} onChange={(e) => set("soft_skills", e.target.value)} placeholder="Leadership, Communication" /></Field>
-                  </div>
-                  <Field label="Resume URL"><Input value={form.resume_url} onChange={(e) => set("resume_url", e.target.value)} /></Field>
-                  <Field label="Portfolio URL"><Input value={form.portfolio_url} onChange={(e) => set("portfolio_url", e.target.value)} /></Field>
-                  <Field label="Personal website"><Input value={form.personal_website} onChange={(e) => set("personal_website", e.target.value)} /></Field>
-                  <div className="sm:col-span-2 text-xs text-muted-foreground">
-                    Add courses, certifications, internships, publications & awards on the{" "}
-                    <a className="text-primary hover:underline" href="/certifications">Certifications</a> page.
-                  </div>
-                </CardContent></Card>
-              </TabsContent>
+              {ctx !== "student" && (
+                <TabsContent value="professional">
+                  <Card><CardContent className="grid gap-3 pt-6 sm:grid-cols-2">
+                    <Field label={ctx === "faculty" ? "College / Institute" : "Organization"}>
+                      <Input
+                        value={ctx === "faculty" ? form.college : form.organization_name}
+                        onChange={(e) =>
+                          ctx === "faculty"
+                            ? set("college", e.target.value)
+                            : set("organization_name", e.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field label="Department"><Input value={form.department} onChange={(e) => set("department", e.target.value)} /></Field>
+                    <Field label="Designation"><Input value={form.designation} onChange={(e) => set("designation", e.target.value)} placeholder={ctx === "faculty" ? "e.g. Assistant Professor" : "e.g. Event Organizer"} /></Field>
+                    <Field label="Current position"><Input value={form.current_position} onChange={(e) => set("current_position", e.target.value)} /></Field>
+                    <Field label="Years of experience"><Input type="number" min={0} max={80} value={form.experience_years} onChange={(e) => set("experience_years", e.target.value)} /></Field>
+                    <Field label="Personal website"><Input value={form.personal_website} onChange={(e) => set("personal_website", e.target.value)} /></Field>
+                    <div className="sm:col-span-2">
+                      <Field label={ctx === "faculty" ? "Areas of expertise (comma-separated)" : "Skills (comma-separated)"}>
+                        <Input value={form.technical_skills} onChange={(e) => set("technical_skills", e.target.value)} placeholder={ctx === "faculty" ? "Machine Learning, Data Structures" : "Operations, Sponsorships"} />
+                      </Field>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Field label="Soft skills (comma-separated)"><Input value={form.soft_skills} onChange={(e) => set("soft_skills", e.target.value)} placeholder="Leadership, Communication" /></Field>
+                    </div>
+                    <Field label={ctx === "faculty" ? "CV URL" : "Resume URL"}><Input value={form.resume_url} onChange={(e) => set("resume_url", e.target.value)} /></Field>
+                    <Field label="Portfolio URL"><Input value={form.portfolio_url} onChange={(e) => set("portfolio_url", e.target.value)} /></Field>
+                    <div className="sm:col-span-2 text-xs text-muted-foreground">
+                      Add certifications, publications & awards on the{" "}
+                      <a className="text-primary hover:underline" href="/certifications">Certifications</a> page.
+                    </div>
+                  </CardContent></Card>
+                </TabsContent>
+              )}
 
               <TabsContent value="social">
                 <Card><CardContent className="grid gap-3 pt-6 sm:grid-cols-2">
@@ -425,13 +463,21 @@ function ProfilePage() {
                   <Field label="Instagram"><Input value={form.instagram_url} onChange={(e) => set("instagram_url", e.target.value)} /></Field>
                   <Field label="Facebook"><Input value={form.facebook_url} onChange={(e) => set("facebook_url", e.target.value)} /></Field>
                   <Field label="Discord username"><Input value={form.discord_username} onChange={(e) => set("discord_username", e.target.value)} /></Field>
-                  <Field label="LeetCode"><Input value={form.leetcode_username} onChange={(e) => set("leetcode_username", e.target.value)} /></Field>
-                  <Field label="Codeforces"><Input value={form.codeforces_username} onChange={(e) => set("codeforces_username", e.target.value)} /></Field>
-                  <Field label="CodeChef"><Input value={form.codechef_username} onChange={(e) => set("codechef_username", e.target.value)} /></Field>
-                  <Field label="HackerRank"><Input value={form.hackerrank_username} onChange={(e) => set("hackerrank_username", e.target.value)} /></Field>
-                  <Field label="GeeksforGeeks"><Input value={form.gfg_username} onChange={(e) => set("gfg_username", e.target.value)} /></Field>
-                  <Field label="ResearchGate"><Input value={form.researchgate_url} onChange={(e) => set("researchgate_url", e.target.value)} /></Field>
-                  <Field label="ORCID"><Input value={form.orcid} onChange={(e) => set("orcid", e.target.value)} /></Field>
+                  {ctx === "student" && (
+                    <>
+                      <Field label="LeetCode"><Input value={form.leetcode_username} onChange={(e) => set("leetcode_username", e.target.value)} /></Field>
+                      <Field label="Codeforces"><Input value={form.codeforces_username} onChange={(e) => set("codeforces_username", e.target.value)} /></Field>
+                      <Field label="CodeChef"><Input value={form.codechef_username} onChange={(e) => set("codechef_username", e.target.value)} /></Field>
+                      <Field label="HackerRank"><Input value={form.hackerrank_username} onChange={(e) => set("hackerrank_username", e.target.value)} /></Field>
+                      <Field label="GeeksforGeeks"><Input value={form.gfg_username} onChange={(e) => set("gfg_username", e.target.value)} /></Field>
+                    </>
+                  )}
+                  {ctx === "faculty" && (
+                    <>
+                      <Field label="ResearchGate"><Input value={form.researchgate_url} onChange={(e) => set("researchgate_url", e.target.value)} /></Field>
+                      <Field label="ORCID"><Input value={form.orcid} onChange={(e) => set("orcid", e.target.value)} /></Field>
+                    </>
+                  )}
                 </CardContent></Card>
               </TabsContent>
             </Tabs>
