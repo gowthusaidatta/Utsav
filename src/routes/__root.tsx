@@ -83,18 +83,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Utsav is a modern event management platform for hackathons, conferences, and campus fests. Registrations, teams, judging, certificates, and analytics at scale.",
+          "Utsav helps teams run hackathons, conferences, and campus fests end-to-end — registrations, teams, judging, QR check-in, certificates, and analytics.",
       },
       { name: "author", content: "Utsav" },
       { property: "og:title", content: "Utsav — Modern Event Management Platform" },
       {
         property: "og:description",
         content:
-          "Run hackathons, conferences, and campus events end-to-end with role-based access, teams, judging, and analytics.",
+          "Utsav helps teams run hackathons, conferences, and campus fests end-to-end — registrations, teams, judging, QR check-in, certificates, and analytics.",
       },
       { property: "og:site_name", content: "Utsav" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Utsav — Modern Event Management Platform" },
+      { name: "twitter:description", content: "Utsav helps teams run hackathons, conferences, and campus fests end-to-end — registrations, teams, judging, QR check-in, certificates, and analytics." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c51049b1-3ad1-4cba-8160-67c37f88e367/id-preview-be83ac92--afdb39a5-6c36-4f35-b7b6-b891f3cf0b58.lovable.app-1784621422557.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c51049b1-3ad1-4cba-8160-67c37f88e367/id-preview-be83ac92--afdb39a5-6c36-4f35-b7b6-b891f3cf0b58.lovable.app-1784621422557.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
