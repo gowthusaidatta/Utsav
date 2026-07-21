@@ -130,6 +130,53 @@ function NewEvent() {
                 />
               </Field>
             </div>
+            <div className="rounded-lg border p-4 space-y-3">
+              <div className="text-sm font-semibold">Registration type *</div>
+              <div className="flex gap-3">
+                {(["individual", "team"] as const).map((t) => (
+                  <label key={t} className={`flex-1 cursor-pointer rounded-md border p-3 text-sm ${form.registration_type === t ? "border-primary bg-primary/5" : ""}`}>
+                    <input
+                      type="radio"
+                      name="regtype"
+                      className="mr-2"
+                      checked={form.registration_type === t}
+                      onChange={() => setForm({ ...form, registration_type: t })}
+                    />
+                    <span className="font-medium capitalize">{t === "individual" ? "Individual (Solo)" : "Team"}</span>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {t === "individual" ? "Each participant registers alone." : "Participants register as a team (hackathon, sports, etc)."}
+                    </div>
+                  </label>
+                ))}
+              </div>
+              {form.registration_type === "team" && (
+                <div className="grid gap-3 sm:grid-cols-3 pt-2">
+                  <Field label="Min team size" required>
+                    <Input type="number" min={2} max={100} value={form.min_team_size} onChange={(e) => setForm({ ...form, min_team_size: e.target.value })} />
+                  </Field>
+                  <Field label="Max team size" required>
+                    <Input type="number" min={2} max={100} value={form.max_team_size} onChange={(e) => setForm({ ...form, max_team_size: e.target.value })} />
+                  </Field>
+                  <Field label="Max teams (optional)">
+                    <Input type="number" min={1} value={form.max_teams} onChange={(e) => setForm({ ...form, max_teams: e.target.value })} />
+                  </Field>
+                </div>
+              )}
+              <div className="grid gap-3 sm:grid-cols-2 pt-2">
+                <Field label="Attendance rule">
+                  <select
+                    className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                    value={form.attendance_rule}
+                    onChange={(e) => setForm({ ...form, attendance_rule: e.target.value as typeof form.attendance_rule })}
+                  >
+                    <option value="member">Per-member check-in</option>
+                    <option value="leader">Leader only</option>
+                    <option value="all_members">Require all members</option>
+                    <option value="any_member">Any member counts</option>
+                  </select>
+                </Field>
+              </div>
+            </div>
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 text-sm">
                 <input
@@ -148,6 +195,7 @@ function NewEvent() {
                 Paid event
               </label>
             </div>
+
             {!form.is_online && (
               <Field label="Venue">
                 <Input
