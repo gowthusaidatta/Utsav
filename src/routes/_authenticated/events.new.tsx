@@ -107,7 +107,7 @@ function NewEvent() {
             .from("event-covers")
             .upload(path, coverFile, { upsert: false, contentType: coverFile.type });
           if (error) throw error;
-          await updateFn({ data: { id: res.id, patch: { cover_image_url: `/api/public/event-covers/${path}` } } });
+          await updateFn({ data: { id: res.id, cover_image_url: `/api/public/event-covers/${path}` } });
         } catch (upErr) {
           toast.error(upErr instanceof Error ? `Cover upload failed: ${upErr.message}` : "Cover upload failed");
         }
