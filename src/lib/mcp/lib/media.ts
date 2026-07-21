@@ -103,3 +103,47 @@ export function extForMime(mime: string, fallback = "bin"): string {
   };
   return map[mime] ?? fallback;
 }
+
+/**
+ * Validate that the authenticated caller is allowed to attach a media record
+ * to the given owner. Prevents users from tagging uploads onto profiles or
+ * organizations they don't control.
+ *
+ * - owner_type "user": owner_id must equal the caller.
+ * - owner_type "organization": caller must belong to the org, or be a
+ *   platform/faculty/org admin (RPC has_role_in_org falls back to admin).
+ * - owner_type "event": event-level RBAC is enforced separately by the
+ *   caller via canManageEvent / has_role_in_event.
+ */
+export async function assertOwnerAllowed(
+  supabase: SupabaseClient,
+  actor: string,
+  ownerType: "event" | "organization" | "user",
+  ownerId: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (ownerType === "user") {
+    if (ownerId !== actor) {
+      return { ok: false, message: "You can only upload media to your own user profile." };
+    }
+    return { ok: true };
+  }
+  if (ownerType === "organization") {
+    // Platform admin short-circuits inside has_role_in_org (falls back to admin check).
+    const { data: isOrgAdmin } = await supabase.rpc("has_role_in_org", {
+      _uid: actor,
+      _role: "org_admin",
+      _org: ownerId,
+    });
+    if (isOrgAdmin) return { ok: true };
+    const { data: member } = await supabase
+      .from("org_members")
+      .select("user_id")
+      .eq("organization_id", ownerId)
+      .eq("user_id", actor)
+      .maybeSingle();
+    if (member) return { ok: true };
+    return { ok: false, message: "You are not a member of that organization." };
+  }
+  // owner_type === "event": event-scope permission is checked separately.
+  return { ok: true };
+}
