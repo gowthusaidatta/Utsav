@@ -31,6 +31,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PageHeader } from "@/components/PageHeader";
+import { ErrorState, EmptyState } from "@/components/EmptyState";
+import { UserCheck } from "lucide-react";
+
+
 
 export const Route = createFileRoute("/_authenticated/admin/user-approvals")({
   head: () => ({ meta: [{ title: "Admin · Account Approvals — Utsav" }] }),
