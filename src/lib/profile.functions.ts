@@ -21,13 +21,16 @@ const PROFILE_COLUMNS = `
 export const getMyProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("profiles")
-      .select(PROFILE_COLUMNS)
-      .eq("id", context.userId)
-      .maybeSingle();
+    const [{ data, error }, { data: roles }] = await Promise.all([
+      context.supabase.from("profiles").select(PROFILE_COLUMNS).eq("id", context.userId).maybeSingle(),
+      context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("scope", "global"),
+    ]);
     if (error) throw new Error(error.message);
-    return data;
+    const roleList = (roles ?? []).map((r: { role: string }) => r.role);
+    const STUDENTISH = new Set(["student", "student_coordinator", "volunteer", "guest"]);
+    const primary_role = roleList[0] ?? "student";
+    const is_student = roleList.length === 0 || roleList.some((r) => STUDENTISH.has(r));
+    return data ? { ...data, primary_role, is_student, roles: roleList } : null;
   });
 
 const nullableString = (max: number) =>
