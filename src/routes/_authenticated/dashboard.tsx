@@ -7,7 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShieldCheck, User, Plus, CalendarDays, LayoutDashboard } from "lucide-react";
+import {
+  ShieldCheck,
+  User,
+  Plus,
+  CalendarDays,
+  LayoutDashboard,
+  Ticket,
+  Bell,
+  Users,
+  Award,
+} from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -24,11 +34,18 @@ function Dashboard() {
   const activeRoles = (roles.data ?? []).filter(
     (r) => !r.expires_at || new Date(r.expires_at) > new Date(),
   );
-  const isAdmin = activeRoles.some((r) => r.role === "admin" && r.scope === "global");
-  const isFaculty = activeRoles.some((r) => r.role === "faculty" && r.scope === "global");
   const canCreateEvent = activeRoles.some((r) =>
-    ["admin", "faculty", "organizer", "coordinator"].includes(r.role),
+    ["admin", "super_admin", "platform_admin", "org_admin", "college_admin", "dept_admin", "faculty", "organizer", "coordinator"].includes(r.role),
   );
+
+  const quickLinks: Array<{ to: string; label: string; icon: React.ReactNode; desc: string }> = [
+    { to: "/my-events", label: "My events", icon: <CalendarDays className="h-4 w-4" />, desc: "Events you manage or organize" },
+    { to: "/my-registrations", label: "My registrations", icon: <Ticket className="h-4 w-4" />, desc: "Events you're registered for" },
+    { to: "/events", label: "Browse events", icon: <CalendarDays className="h-4 w-4" />, desc: "Discover upcoming events" },
+    { to: "/notifications", label: "Notifications", icon: <Bell className="h-4 w-4" />, desc: "Announcements & updates" },
+    { to: "/delegations", label: "Delegations", icon: <Users className="h-4 w-4" />, desc: "Roles delegated to you" },
+    { to: "/profile", label: "Profile & certificates", icon: <Award className="h-4 w-4" />, desc: "Your identity and awards" },
+  ];
 
   return (
     <main className="container mx-auto px-4 py-6 space-y-6">
@@ -55,11 +72,9 @@ function Dashboard() {
         }
       />
 
-
-
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <ShieldCheck className="h-4 w-4 text-primary" /> Your roles
             </CardTitle>
@@ -103,46 +118,21 @@ function Dashboard() {
         </Card>
       </div>
 
-      {(isAdmin || isFaculty) && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {isAdmin ? "Admin" : "Faculty"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            {isAdmin && (
-              <>
-                <Button asChild size="sm">
-                  <Link to="/admin/users">Users & roles</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/admin/organizations">Organizations</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/admin/delegations">Delegations</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/admin/role-matrix">Role matrix</Link>
-                </Button>
-              </>
-            )}
-            <Button asChild size="sm" variant="outline">
-              <Link to="/admin/approvals">Event approvals</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Coming soon</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          Events, registrations, teams, submissions, judging, QR check-in, certificates, and
-          analytics ship in the next phase — built on top of this foundation.
-        </CardContent>
-      </Card>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {quickLinks.map((q) => (
+          <Link
+            key={q.to}
+            to={q.to}
+            className="rounded-lg border bg-card p-4 transition-colors hover:border-primary/50 hover:bg-accent/40"
+          >
+            <div className="flex items-center gap-2 font-medium">
+              <span className="text-primary">{q.icon}</span>
+              {q.label}
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">{q.desc}</p>
+          </Link>
+        ))}
+      </div>
     </main>
   );
 }
