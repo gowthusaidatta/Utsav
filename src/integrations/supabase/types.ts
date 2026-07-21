@@ -112,6 +112,126 @@ export type Database = {
           },
         ]
       }
+      event_announcements: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          is_pinned: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          id?: string
+          is_pinned?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          is_pinned?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_announcements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_faqs: {
+        Row: {
+          answer: string
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          question: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          id?: string
+          question: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          question?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_faqs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string
+          event_id: string
+          id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_feedback_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           capacity: number | null

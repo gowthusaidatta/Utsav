@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Trash2, Copy, Send, CheckCircle2, XCircle, Archive } from "lucide-react";
+import { ManageFaqs, ManageAnnouncements } from "@/components/ManageEventExtras";
 
 export const Route = createFileRoute("/_authenticated/events/$id/manage")({
   head: () => ({ meta: [{ title: "Manage Event — Utsav" }] }),
@@ -470,6 +471,9 @@ function ManageEvent() {
           </form>
         </CardContent>
       </Card>
+
+      <ManageAnnouncements eventId={id} />
+      <ManageFaqs eventId={id} />
     </main>
   );
 }
