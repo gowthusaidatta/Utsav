@@ -38,6 +38,7 @@ const HIDE_ON = [
   /^\/auth\/?$/,
   /^\/reset-password\/?$/,
   /^\/verify\/.+/,
+  /^\/dashboard\/?$/,
   /^\/\.well-known\//,
   /^\/\.lovable\//,
 ];

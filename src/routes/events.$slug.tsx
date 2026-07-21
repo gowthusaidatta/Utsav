@@ -5,6 +5,7 @@ import {
   listEventFaqs,
   listEventAnnouncements,
 } from "@/lib/event-extras.functions";
+import { listEventLinks } from "@/lib/event-links.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Calendar, Clock, MapPin, Users, IndianRupee, Globe, Megaphone, Pin } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, IndianRupee, Globe, Megaphone, Pin, LinkIcon } from "lucide-react";
 import { BackBar } from "@/components/BackBar";
 import { EventFeedback } from "@/components/EventFeedback";
 import { useServerFn } from "@tanstack/react-start";
@@ -117,13 +118,28 @@ function EventDetail() {
     queryFn: () => annFn({ data: { event_id: e!.id } }),
     enabled: !!e?.id,
   });
+  const linksFn = useServerFn(listEventLinks);
+  const links = useQuery({
+    queryKey: ["event-links", e?.id],
+    queryFn: () => linksFn({ data: { event_id: e!.id } }),
+    enabled: !!e?.id,
+  });
   const uid = useSignedInUserId();
   if (!e) return null;
+  const isCancelled = e.status === "cancelled";
 
   return (
     <>
     <BackBar />
     <main className="container mx-auto max-w-4xl px-4 py-10 space-y-8">
+      {isCancelled && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
+          <div className="font-semibold text-destructive">This event has been cancelled.</div>
+          {e.cancel_reason && (
+            <p className="mt-1 text-muted-foreground">{e.cancel_reason}</p>
+          )}
+        </div>
+      )}
       {e.cover_image_url && (
         <div className="aspect-[16/7] overflow-hidden rounded-2xl bg-muted">
           <img src={e.cover_image_url} alt="" className="h-full w-full object-cover" />
@@ -226,6 +242,37 @@ function EventDetail() {
                 </AccordionItem>
               ))}
             </Accordion>
+          </CardContent>
+        </Card>
+      )}
+
+      {(links.data ?? []).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <LinkIcon className="h-4 w-4 text-primary" /> Related links
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="divide-y">
+              {links.data!.map((l) => (
+                <li key={l.id} className="py-3">
+                  <a
+                    href={l.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    {l.title}
+                  </a>
+                  {l.description && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {l.description}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
       )}
