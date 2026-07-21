@@ -94,6 +94,25 @@ function NewEvent() {
         attendance_rule: form.attendance_rule,
       };
       const res = await fn({ data: payload });
+
+      if (coverFile) {
+        try {
+          const { data: userRes } = await supabase.auth.getUser();
+          const uid = userRes.user?.id;
+          if (!uid) throw new Error("Not signed in");
+          const ext = coverFile.name.split(".").pop()?.toLowerCase() || "jpg";
+          const safe = `${Date.now()}.${ext.replace(/[^a-z0-9]/gi, "").slice(0, 5)}`;
+          const path = `${uid}/${res.id}/${safe}`;
+          const { error } = await supabase.storage
+            .from("event-covers")
+            .upload(path, coverFile, { upsert: false, contentType: coverFile.type });
+          if (error) throw error;
+          await updateFn({ data: { id: res.id, patch: { cover_image_url: `/api/public/event-covers/${path}` } } });
+        } catch (upErr) {
+          toast.error(upErr instanceof Error ? `Cover upload failed: ${upErr.message}` : "Cover upload failed");
+        }
+      }
+
       toast.success("Event created as draft");
       router.navigate({ to: "/events/$id/manage", params: { id: res.id } });
     } catch (err) {
