@@ -1,5 +1,6 @@
-import ExcelJS from "exceljs";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+// pdf-lib and exceljs are dynamically imported inside the functions that use them
+// to keep them out of the shared SSR router chunk (they break at module init on
+// Cloudflare Workers).
 
 export type Row = Record<string, unknown>;
 
@@ -19,6 +20,7 @@ export function toCsv(rows: Row[], columns?: string[]): string {
 }
 
 export async function toXlsx(rows: Row[], sheetName: string, columns?: string[]): Promise<Buffer> {
+  const { default: ExcelJS } = await import("exceljs");
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet(sheetName.substring(0, 31) || "Sheet1");
   const cols = columns ?? (rows[0] ? Object.keys(rows[0]) : []);
@@ -37,6 +39,7 @@ export async function toXlsx(rows: Row[], sheetName: string, columns?: string[])
 }
 
 export async function toPdfReport(title: string, subtitle: string, rows: Row[], columns?: string[]): Promise<Buffer> {
+  const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const pdf = await PDFDocument.create();
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
