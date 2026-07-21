@@ -23,8 +23,10 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMyRegistrationsRouteImport } from './routes/_authenticated/my-registrations'
 import { Route as AuthenticatedMyEventsRouteImport } from './routes/_authenticated/my-events'
+import { Route as AuthenticatedEducationRouteImport } from './routes/_authenticated/education'
 import { Route as AuthenticatedDelegationsRouteImport } from './routes/_authenticated/delegations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCertificationsRouteImport } from './routes/_authenticated/certifications'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authenticated/events.new'
@@ -112,6 +114,11 @@ const AuthenticatedMyEventsRoute = AuthenticatedMyEventsRouteImport.update({
   path: '/my-events',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEducationRoute = AuthenticatedEducationRouteImport.update({
+  id: '/education',
+  path: '/education',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDelegationsRoute =
   AuthenticatedDelegationsRouteImport.update({
     id: '/delegations',
@@ -123,6 +130,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCertificationsRoute =
+  AuthenticatedCertificationsRouteImport.update({
+    id: '/certifications',
+    path: '/certifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -219,8 +232,10 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/certifications': typeof AuthenticatedCertificationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/delegations': typeof AuthenticatedDelegationsRoute
+  '/education': typeof AuthenticatedEducationRoute
   '/my-events': typeof AuthenticatedMyEventsRoute
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -251,8 +266,10 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/certifications': typeof AuthenticatedCertificationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/delegations': typeof AuthenticatedDelegationsRoute
+  '/education': typeof AuthenticatedEducationRoute
   '/my-events': typeof AuthenticatedMyEventsRoute
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -285,8 +302,10 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/_authenticated/certifications': typeof AuthenticatedCertificationsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/delegations': typeof AuthenticatedDelegationsRoute
+  '/_authenticated/education': typeof AuthenticatedEducationRoute
   '/_authenticated/my-events': typeof AuthenticatedMyEventsRoute
   '/_authenticated/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
@@ -319,8 +338,10 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/certifications'
     | '/dashboard'
     | '/delegations'
+    | '/education'
     | '/my-events'
     | '/my-registrations'
     | '/notifications'
@@ -351,8 +372,10 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/certifications'
     | '/dashboard'
     | '/delegations'
+    | '/education'
     | '/my-events'
     | '/my-registrations'
     | '/notifications'
@@ -384,8 +407,10 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/certifications'
     | '/_authenticated/dashboard'
     | '/_authenticated/delegations'
+    | '/_authenticated/education'
     | '/_authenticated/my-events'
     | '/_authenticated/my-registrations'
     | '/_authenticated/notifications'
@@ -526,6 +551,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyEventsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/education': {
+      id: '/_authenticated/education'
+      path: '/education'
+      fullPath: '/education'
+      preLoaderRoute: typeof AuthenticatedEducationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/delegations': {
       id: '/_authenticated/delegations'
       path: '/delegations'
@@ -538,6 +570,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/certifications': {
+      id: '/_authenticated/certifications'
+      path: '/certifications'
+      fullPath: '/certifications'
+      preLoaderRoute: typeof AuthenticatedCertificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/.well-known/oauth-protected-resource': {
@@ -664,8 +703,10 @@ const AuthenticatedAdminOrganizationsRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCertificationsRoute: typeof AuthenticatedCertificationsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDelegationsRoute: typeof AuthenticatedDelegationsRoute
+  AuthenticatedEducationRoute: typeof AuthenticatedEducationRoute
   AuthenticatedMyEventsRoute: typeof AuthenticatedMyEventsRoute
   AuthenticatedMyRegistrationsRoute: typeof AuthenticatedMyRegistrationsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
@@ -683,8 +724,10 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCertificationsRoute: AuthenticatedCertificationsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDelegationsRoute: AuthenticatedDelegationsRoute,
+  AuthenticatedEducationRoute: AuthenticatedEducationRoute,
   AuthenticatedMyEventsRoute: AuthenticatedMyEventsRoute,
   AuthenticatedMyRegistrationsRoute: AuthenticatedMyRegistrationsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
