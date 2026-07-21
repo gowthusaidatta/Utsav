@@ -583,32 +583,8 @@ export const rejectUser = createServerFn({ method: "POST" })
 
 // -----------------------------------------------------------
 // verifyMyPermissions — returns roles, delegations, and a permission map keyed by action.
-// Used by /admin/role-matrix. Accepts an optional list of actions to probe; defaults to
-// the platform's canonical action list.
-// -----------------------------------------------------------
-const DEFAULT_PROBE_ACTIONS = [
-  "view_event",
-  "create_event",
-  "edit_event",
-  "publish_event",
-  "delete_event",
-  "register",
-  "create_team",
-  "submit_project",
-  "manage_teams",
-  "approve_registration",
-  "score_submissions",
-  "check_in",
-  "issue_certificates",
-  "manage_users",
-  "manage_organizations",
-  "view_finance",
-  "manage_media",
-  "mentor_teams",
-  "sponsor_view",
-  "view_audit_logs",
-] as const;
-
+// When `actions` is omitted, probes every action registered in `public.role_permissions`
+// so the admin matrix stays in sync with the DB catalog automatically.
 export const verifyMyPermissions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -621,8 +597,16 @@ export const verifyMyPermissions = createServerFn({ method: "POST" })
       .parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
-    const actions = data?.actions ?? [...DEFAULT_PROBE_ACTIONS];
     const eventId = data?.eventId ?? undefined;
+
+    let actions = data?.actions;
+    if (!actions || actions.length === 0) {
+      const { data: catalog, error: cErr } = await context.supabase
+        .from("role_permissions")
+        .select("action");
+      if (cErr) throw new Error(cErr.message);
+      actions = (catalog ?? []).map((r) => r.action);
+    }
 
     const [rolesRes, delegationsRes] = await Promise.all([
       context.supabase
@@ -645,16 +629,43 @@ export const verifyMyPermissions = createServerFn({ method: "POST" })
     );
 
     const map: Record<string, boolean> = {};
-    for (const a of actions) {
-      const { data: r } = await context.supabase.rpc("can", {
-        _uid: context.userId,
-        _action: a,
-        _event: eventId,
-      });
-      map[a] = !!r;
-    }
+    await Promise.all(
+      actions.map(async (a) => {
+        const { data: r } = await context.supabase.rpc("can", {
+          _uid: context.userId,
+          _action: a,
+          _event: eventId,
+        });
+        map[a] = !!r;
+      }),
+    );
     return { roles, delegations, actions: map };
   });
+
+// Full permission catalog — the source-of-truth mapping used by the admin matrix
+// and any UI that needs to enumerate every action. Read-only.
+export const listPermissionCatalog = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("role_permissions")
+      .select(
+        "action, category, label, global_roles, event_roles, is_public, is_self_service",
+      )
+      .order("category", { ascending: true })
+      .order("action", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Array<{
+      action: string;
+      category: string;
+      label: string;
+      global_roles: string[];
+      event_roles: string[];
+      is_public: boolean;
+      is_self_service: boolean;
+    }>;
+  });
+
 
 // -----------------------------------------------------------
 // Delegation listing / revocation (used by /admin/delegations and /delegations)
