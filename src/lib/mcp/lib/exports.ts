@@ -39,6 +39,7 @@ export async function toXlsx(rows: Row[], sheetName: string, columns?: string[])
 }
 
 export async function toPdfReport(title: string, subtitle: string, rows: Row[], columns?: string[]): Promise<Buffer> {
+  const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const pdf = await PDFDocument.create();
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
