@@ -5,8 +5,11 @@ import { myRegistrations, cancelRegistration } from "@/lib/registrations.functio
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { Calendar, Ticket } from "lucide-react";
 import { toast } from "sonner";
+import { PageHeader } from "@/components/PageHeader";
+import { EmptyState, ListSkeleton } from "@/components/EmptyState";
+
 
 export const Route = createFileRoute("/_authenticated/my-registrations")({
   head: () => ({ meta: [{ title: "My Registrations — Utsav" }] }),
