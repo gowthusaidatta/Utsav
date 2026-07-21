@@ -207,7 +207,7 @@ function UserApprovalsPage() {
                 <TableRow>
                   <TableCell colSpan={5}>
                     <EmptyState
-                      icon={UserCheck}
+                      icon={<UserCheck className="h-6 w-6" />}
                       title="No pending accounts"
                       description="New Faculty and Coordinator signups will appear here for approval."
                     />
