@@ -131,6 +131,58 @@ function NewEvent() {
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={onSubmit}>
+            <Field label="Cover image">
+              {coverPreview ? (
+                <div className="relative overflow-hidden rounded-lg border bg-muted">
+                  <img src={coverPreview} alt="Cover preview" className="aspect-[16/7] w-full object-cover" />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    className="absolute right-2 top-2"
+                    onClick={clearCover}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+                  onDragLeave={() => setDrag(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDrag(false);
+                    const f = e.dataTransfer.files?.[0];
+                    if (f) pickCover(f);
+                  }}
+                  onClick={() => coverInputRef.current?.click()}
+                  className={`flex aspect-[16/7] w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-sm text-muted-foreground transition-colors ${
+                    drag ? "border-primary bg-primary/5" : "border-border"
+                  }`}
+                >
+                  {busy ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    <>
+                      <Upload className="h-6 w-6" />
+                      <div>Drag &amp; drop or click to upload</div>
+                      <div className="text-xs">JPG, PNG, WebP, AVIF · max {COVER_MAX_MB} MB</div>
+                    </>
+                  )}
+                </div>
+              )}
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept={COVER_ACCEPT.join(",")}
+                hidden
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) pickCover(f);
+                  e.target.value = "";
+                }}
+              />
+            </Field>
             <Field label="Title" required>
               <Input
                 required
