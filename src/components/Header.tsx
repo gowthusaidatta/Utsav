@@ -12,8 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket, Plus } from "lucide-react";
+import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket, Plus, Bell } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationBell } from "@/components/NotificationBell";
+import { CommandPalette } from "@/components/CommandPalette";
+
 
 export function Header() {
   const { user, loading } = useSession();
@@ -47,8 +50,11 @@ export function Header() {
           <span>Utsav</span>
         </Link>
         <nav className="flex items-center gap-2">
+          {user && <CommandPalette />}
           <ThemeToggle />
+          {user && <NotificationBell />}
           {loading ? null : user ? (
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-2">
@@ -75,6 +81,10 @@ export function Header() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/my-registrations" })}>
                   <Ticket className="mr-2 h-4 w-4" /> My registrations
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/notifications" })}>
+                  <Bell className="mr-2 h-4 w-4" /> Notifications
+                </DropdownMenuItem>
+
                 <DropdownMenuItem onClick={() => navigate({ to: "/delegations" })}>
                   <UserIcon className="mr-2 h-4 w-4" /> Delegations
                 </DropdownMenuItem>
