@@ -44,6 +44,9 @@ export default defineTool({
     const scan = scanBuffer(buf);
     if (scan === "infected") return invalidInput("Payload rejected by malware scanner.");
 
+    const ownerCheck = await assertOwnerAllowed(supabase, actor, input.owner_type, input.owner_id);
+    if (!ownerCheck.ok) return forbidden(ownerCheck.message);
+
     if (input.event_id) {
       const isAdmin = await hasGlobalRole(supabase, actor, "admin");
       const isFaculty = await hasGlobalRole(supabase, actor, "faculty");
