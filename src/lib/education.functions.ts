@@ -39,13 +39,13 @@ export const createEducation = createServerFn({ method: "POST" })
   .inputValidator((input) => educationSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await (context.supabase.from("user_education") as unknown as {
-      insert: (v: Record<string, unknown>) => { select: () => { single: () => Promise<{ data: unknown; error: { message: string } | null }> } };
+      insert: (v: Record<string, unknown>) => { select: () => { single: () => Promise<{ data: Record<string, unknown> | null; error: { message: string } | null }> } };
     })
       .insert({ ...data, user_id: context.userId })
       .select()
       .single();
     if (error) throw new Error(error.message);
-    return row;
+    return row as Record<string, unknown> | null;
   });
 
 export const updateEducation = createServerFn({ method: "POST" })
