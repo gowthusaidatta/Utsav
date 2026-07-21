@@ -17,6 +17,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
+import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
@@ -77,6 +78,11 @@ const EventsIndexRoute = EventsIndexRouteImport.update({
 const VerifyCodeRoute = VerifyCodeRouteImport.update({
   id: '/verify/$code',
   path: '/verify/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileUsernameRoute = ProfileUsernameRouteImport.update({
+  id: '/profile/$username',
+  path: '/profile/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsSlugRoute = EventsSlugRouteImport.update({
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/profile/$username': typeof ProfileUsernameRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/events/': typeof EventsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/profile/$username': typeof ProfileUsernameRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/events': typeof EventsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/profile/$username': typeof ProfileUsernameRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/events/': typeof EventsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/events/$slug'
+    | '/profile/$username'
     | '/verify/$code'
     | '/events/'
     | '/.lovable/oauth/consent'
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/events/$slug'
+    | '/profile/$username'
     | '/verify/$code'
     | '/events'
     | '/.lovable/oauth/consent'
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/events/$slug'
+    | '/profile/$username'
     | '/verify/$code'
     | '/events/'
     | '/.lovable/oauth/consent'
@@ -407,6 +419,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   EventsSlugRoute: typeof EventsSlugRoute
+  ProfileUsernameRoute: typeof ProfileUsernameRoute
   VerifyCodeRoute: typeof VerifyCodeRoute
   EventsIndexRoute: typeof EventsIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -469,6 +482,13 @@ declare module '@tanstack/react-router' {
       path: '/verify/$code'
       fullPath: '/verify/$code'
       preLoaderRoute: typeof VerifyCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/$username': {
+      id: '/profile/$username'
+      path: '/profile/$username'
+      fullPath: '/profile/$username'
+      preLoaderRoute: typeof ProfileUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/$slug': {
@@ -697,6 +717,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   EventsSlugRoute: EventsSlugRoute,
+  ProfileUsernameRoute: ProfileUsernameRoute,
   VerifyCodeRoute: VerifyCodeRoute,
   EventsIndexRoute: EventsIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
