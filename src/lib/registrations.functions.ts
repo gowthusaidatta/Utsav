@@ -13,13 +13,20 @@ export const registerForEvent = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: ev, error: eErr } = await supabase
       .from("events")
-      .select("id, status, capacity, is_paid, registration_deadline")
+      .select("id, status, capacity, is_paid, registration_deadline, registration_type, min_team_size, max_team_size")
       .eq("id", data.event_id)
       .single();
     if (eErr || !ev) throw new Error("Event not found");
     if (ev.status !== "published") throw new Error("Event is not open for registration");
     if (ev.registration_deadline && new Date(ev.registration_deadline).getTime() < Date.now())
       throw new Error("Registration deadline has passed");
+
+    if (ev.registration_type === "team" && !data.team_id) {
+      throw new Error("This is a team event — you must create or join a team");
+    }
+    if (ev.registration_type === "individual" && data.team_id) {
+      throw new Error("This is an individual event — team is not allowed");
+    }
 
     let status: "registered" | "waitlist" = "registered";
     if (ev.capacity) {
@@ -30,6 +37,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
         .in("status", ["registered", "checked_in"]);
       if ((count ?? 0) >= ev.capacity) status = "waitlist";
     }
+
 
     const payment_status = ev.is_paid ? "pending" : "not_required";
     const { data: row, error } = await supabase
@@ -79,12 +87,13 @@ export const myRegistrations = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("registrations")
-      .select("id, status, payment_status, team_id, created_at, event:events(id, slug, title, start_at, cover_image_url)")
+      .select("id, status, payment_status, team_id, qr_token, qr_revoked_at, checked_in_at, created_at, event:events(id, slug, title, start_at, cover_image_url, registration_type)")
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
 
 export const listEventRegistrations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

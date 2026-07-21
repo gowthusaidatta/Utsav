@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance_logs: {
+        Row: {
+          action: string
+          created_at: string
+          device_info: string | null
+          event_id: string
+          id: string
+          method: string | null
+          notes: string | null
+          operator_id: string | null
+          registration_id: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          device_info?: string | null
+          event_id: string
+          id?: string
+          method?: string | null
+          notes?: string | null
+          operator_id?: string | null
+          registration_id: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          device_info?: string | null
+          event_id?: string
+          id?: string
+          method?: string | null
+          notes?: string | null
+          operator_id?: string | null
+          registration_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_logs_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -312,8 +366,10 @@ export type Database = {
       }
       events: {
         Row: {
+          attendance_rule: string
           capacity: number | null
           category: string | null
+          certificate_rule: string
           cover_image_url: string | null
           created_at: string
           created_by: string
@@ -323,15 +379,21 @@ export type Database = {
           id: string
           is_online: boolean
           is_paid: boolean
+          max_team_size: number | null
+          max_teams: number | null
           meeting_url: string | null
+          min_team_size: number | null
           organization_id: string | null
           price: number
           published_at: string | null
+          qr_secret: string
           registration_deadline: string | null
+          registration_type: string
           slug: string
           start_at: string | null
           status: Database["public"]["Enums"]["event_status"]
           tags: string[]
+          team_config: Json
           timezone: string
           title: string
           updated_at: string
@@ -339,8 +401,10 @@ export type Database = {
           visibility: Database["public"]["Enums"]["event_visibility"]
         }
         Insert: {
+          attendance_rule?: string
           capacity?: number | null
           category?: string | null
+          certificate_rule?: string
           cover_image_url?: string | null
           created_at?: string
           created_by: string
@@ -350,15 +414,21 @@ export type Database = {
           id?: string
           is_online?: boolean
           is_paid?: boolean
+          max_team_size?: number | null
+          max_teams?: number | null
           meeting_url?: string | null
+          min_team_size?: number | null
           organization_id?: string | null
           price?: number
           published_at?: string | null
+          qr_secret?: string
           registration_deadline?: string | null
+          registration_type?: string
           slug: string
           start_at?: string | null
           status?: Database["public"]["Enums"]["event_status"]
           tags?: string[]
+          team_config?: Json
           timezone?: string
           title: string
           updated_at?: string
@@ -366,8 +436,10 @@ export type Database = {
           visibility?: Database["public"]["Enums"]["event_visibility"]
         }
         Update: {
+          attendance_rule?: string
           capacity?: number | null
           category?: string | null
+          certificate_rule?: string
           cover_image_url?: string | null
           created_at?: string
           created_by?: string
@@ -377,15 +449,21 @@ export type Database = {
           id?: string
           is_online?: boolean
           is_paid?: boolean
+          max_team_size?: number | null
+          max_teams?: number | null
           meeting_url?: string | null
+          min_team_size?: number | null
           organization_id?: string | null
           price?: number
           published_at?: string | null
+          qr_secret?: string
           registration_deadline?: string | null
+          registration_type?: string
           slug?: string
           start_at?: string | null
           status?: Database["public"]["Enums"]["event_status"]
           tags?: string[]
+          team_config?: Json
           timezone?: string
           title?: string
           updated_at?: string
@@ -902,42 +980,60 @@ export type Database = {
       registrations: {
         Row: {
           checked_in_at: string | null
+          checked_in_by: string | null
+          checked_out_at: string | null
           created_at: string
           event_id: string
           id: string
           notes: string | null
           payment_reference: string | null
           payment_status: string
+          qr_revoked_at: string | null
+          qr_token: string
+          qr_version: number
           status: string
           team_id: string | null
           updated_at: string
           user_id: string
+          walk_in: boolean
         }
         Insert: {
           checked_in_at?: string | null
+          checked_in_by?: string | null
+          checked_out_at?: string | null
           created_at?: string
           event_id: string
           id?: string
           notes?: string | null
           payment_reference?: string | null
           payment_status?: string
+          qr_revoked_at?: string | null
+          qr_token?: string
+          qr_version?: number
           status?: string
           team_id?: string | null
           updated_at?: string
           user_id: string
+          walk_in?: boolean
         }
         Update: {
           checked_in_at?: string | null
+          checked_in_by?: string | null
+          checked_out_at?: string | null
           created_at?: string
           event_id?: string
           id?: string
           notes?: string | null
           payment_reference?: string | null
           payment_status?: string
+          qr_revoked_at?: string | null
+          qr_token?: string
+          qr_version?: number
           status?: string
           team_id?: string | null
           updated_at?: string
           user_id?: string
+          walk_in?: boolean
         }
         Relationships: [
           {
@@ -989,6 +1085,56 @@ export type Database = {
         }
         Relationships: []
       }
+      team_invites: {
+        Row: {
+          created_at: string
+          id: string
+          invited_by: string
+          invited_email: string | null
+          invited_user_id: string | null
+          invited_username: string | null
+          message: string | null
+          responded_at: string | null
+          status: string
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_by: string
+          invited_email?: string | null
+          invited_user_id?: string | null
+          invited_username?: string | null
+          message?: string | null
+          responded_at?: string | null
+          status?: string
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_by?: string
+          invited_email?: string | null
+          invited_user_id?: string | null
+          invited_username?: string | null
+          message?: string | null
+          responded_at?: string | null
+          status?: string
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invites_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_members: {
         Row: {
           id: string
@@ -1026,37 +1172,49 @@ export type Database = {
       }
       teams: {
         Row: {
+          auto_accept: boolean
           created_at: string
           description: string | null
           event_id: string
           id: string
           invite_code: string
           leader_user_id: string
+          locked: boolean
+          logo_url: string | null
           max_size: number
+          min_size: number
           name: string
           status: string
           updated_at: string
         }
         Insert: {
+          auto_accept?: boolean
           created_at?: string
           description?: string | null
           event_id: string
           id?: string
           invite_code?: string
           leader_user_id: string
+          locked?: boolean
+          logo_url?: string | null
           max_size?: number
+          min_size?: number
           name: string
           status?: string
           updated_at?: string
         }
         Update: {
+          auto_accept?: boolean
           created_at?: string
           description?: string | null
           event_id?: string
           id?: string
           invite_code?: string
           leader_user_id?: string
+          locked?: boolean
+          logo_url?: string | null
           max_size?: number
+          min_size?: number
           name?: string
           status?: string
           updated_at?: string
@@ -1275,6 +1433,7 @@ export type Database = {
         Args: { _actor: string; _target: string }
         Returns: boolean
       }
+      event_attendance_stats: { Args: { _event: string }; Returns: Json }
       get_public_profile: { Args: { _username: string }; Returns: Json }
       has_any_global_role: {
         Args: { _roles: string[]; _uid: string }
@@ -1310,6 +1469,7 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: number
       }
+      verify_registration_qr: { Args: { _token: string }; Returns: Json }
     }
     Enums: {
       app_role:

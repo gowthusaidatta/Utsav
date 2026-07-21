@@ -12,20 +12,47 @@ export const createTeam = createServerFn({ method: "POST" })
         event_id: uuid,
         name: z.string().trim().min(2).max(80),
         description: z.string().max(500).optional(),
-        max_size: z.number().int().min(1).max(50).optional(),
+        logo_url: z.string().url().max(500).optional(),
+        max_size: z.number().int().min(2).max(100).optional(),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+
+    // Resolve event's team size constraints
+    const { data: ev, error: evErr } = await supabase
+      .from("events")
+      .select("id, registration_type, min_team_size, max_team_size, max_teams")
+      .eq("id", data.event_id)
+      .single();
+    if (evErr || !ev) throw new Error("Event not found");
+    if (ev.registration_type !== "team") throw new Error("This event does not accept teams");
+
+    // Enforce max_teams cap
+    if (ev.max_teams) {
+      const { count } = await supabase
+        .from("teams")
+        .select("*", { count: "exact", head: true })
+        .eq("event_id", data.event_id)
+        .eq("status", "active");
+      if ((count ?? 0) >= ev.max_teams) throw new Error("Team registration is closed (max teams reached)");
+    }
+
+    const requested = data.max_size ?? ev.max_team_size ?? 4;
+    const maxSize = Math.min(requested, ev.max_team_size ?? requested);
+    const minSize = ev.min_team_size ?? 2;
+
     const { data: row, error } = await supabase
       .from("teams")
       .insert({
         event_id: data.event_id,
         name: data.name,
         description: data.description ?? null,
+        logo_url: data.logo_url ?? null,
         leader_user_id: userId,
-        max_size: data.max_size ?? 4,
+        max_size: maxSize,
+        min_size: minSize,
       })
       .select("id, invite_code")
       .single();
@@ -39,6 +66,7 @@ export const createTeam = createServerFn({ method: "POST" })
     });
     return row;
   });
+
 
 export const listEventTeams = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

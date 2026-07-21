@@ -19,6 +19,7 @@ import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
+import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMyRegistrationsRouteImport } from './routes/_authenticated/my-registrations'
@@ -29,6 +30,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCertificationsRouteImport } from './routes/_authenticated/certifications'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as AuthenticatedTeamsIdRouteImport } from './routes/_authenticated/teams.$id'
 import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authenticated/events.new'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminUserApprovalsRouteImport } from './routes/_authenticated/admin.user-approvals'
@@ -41,6 +43,7 @@ import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.
 import { Route as AuthenticatedEventsSlugRegisterRouteImport } from './routes/_authenticated/events.$slug.register'
 import { Route as AuthenticatedEventsIdRegistrationsRouteImport } from './routes/_authenticated/events.$id.registrations'
 import { Route as AuthenticatedEventsIdManageRouteImport } from './routes/_authenticated/events.$id.manage'
+import { Route as AuthenticatedEventsIdAttendanceRouteImport } from './routes/_authenticated/events.$id.attendance'
 import { Route as AuthenticatedAdminOrganizationsIdRouteImport } from './routes/_authenticated/admin.organizations.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -91,6 +94,11 @@ const EventsSlugRoute = EventsSlugRouteImport.update({
   id: '/events/$slug',
   path: '/events/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
@@ -148,6 +156,11 @@ const Char91DotmcpChar93ListToolsRoute =
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedTeamsIdRoute = AuthenticatedTeamsIdRouteImport.update({
+  id: '/teams/$id',
+  path: '/teams/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedEventsNewRoute = AuthenticatedEventsNewRouteImport.update({
   id: '/events/new',
   path: '/events/new',
@@ -217,6 +230,12 @@ const AuthenticatedEventsIdManageRoute =
     path: '/events/$id/manage',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEventsIdAttendanceRoute =
+  AuthenticatedEventsIdAttendanceRouteImport.update({
+    id: '/events/$id/attendance',
+    path: '/events/$id/attendance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminOrganizationsIdRoute =
   AuthenticatedAdminOrganizationsIdRouteImport.update({
     id: '/$id',
@@ -240,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/events/$slug': typeof EventsSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -253,7 +273,9 @@ export interface FileRoutesByFullPath {
   '/admin/user-approvals': typeof AuthenticatedAdminUserApprovalsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
+  '/teams/$id': typeof AuthenticatedTeamsIdRoute
   '/admin/organizations/$id': typeof AuthenticatedAdminOrganizationsIdRoute
+  '/events/$id/attendance': typeof AuthenticatedEventsIdAttendanceRoute
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
   '/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
@@ -274,6 +296,7 @@ export interface FileRoutesByTo {
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/events/$slug': typeof EventsSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -287,7 +310,9 @@ export interface FileRoutesByTo {
   '/admin/user-approvals': typeof AuthenticatedAdminUserApprovalsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
+  '/teams/$id': typeof AuthenticatedTeamsIdRoute
   '/admin/organizations/$id': typeof AuthenticatedAdminOrganizationsIdRoute
+  '/events/$id/attendance': typeof AuthenticatedEventsIdAttendanceRoute
   '/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
   '/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
@@ -310,6 +335,7 @@ export interface FileRoutesById {
   '/_authenticated/my-registrations': typeof AuthenticatedMyRegistrationsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/events/$slug': typeof EventsSlugRoute
   '/profile/$username': typeof ProfileUsernameRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -323,7 +349,9 @@ export interface FileRoutesById {
   '/_authenticated/admin/user-approvals': typeof AuthenticatedAdminUserApprovalsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/events/new': typeof AuthenticatedEventsNewRoute
+  '/_authenticated/teams/$id': typeof AuthenticatedTeamsIdRoute
   '/_authenticated/admin/organizations/$id': typeof AuthenticatedAdminOrganizationsIdRoute
+  '/_authenticated/events/$id/attendance': typeof AuthenticatedEventsIdAttendanceRoute
   '/_authenticated/events/$id/manage': typeof AuthenticatedEventsIdManageRoute
   '/_authenticated/events/$id/registrations': typeof AuthenticatedEventsIdRegistrationsRoute
   '/_authenticated/events/$slug/register': typeof AuthenticatedEventsSlugRegisterRoute
@@ -346,6 +374,7 @@ export interface FileRouteTypes {
     | '/my-registrations'
     | '/notifications'
     | '/profile'
+    | '/scan'
     | '/events/$slug'
     | '/profile/$username'
     | '/verify/$code'
@@ -359,7 +388,9 @@ export interface FileRouteTypes {
     | '/admin/user-approvals'
     | '/admin/users'
     | '/events/new'
+    | '/teams/$id'
     | '/admin/organizations/$id'
+    | '/events/$id/attendance'
     | '/events/$id/manage'
     | '/events/$id/registrations'
     | '/events/$slug/register'
@@ -380,6 +411,7 @@ export interface FileRouteTypes {
     | '/my-registrations'
     | '/notifications'
     | '/profile'
+    | '/scan'
     | '/events/$slug'
     | '/profile/$username'
     | '/verify/$code'
@@ -393,7 +425,9 @@ export interface FileRouteTypes {
     | '/admin/user-approvals'
     | '/admin/users'
     | '/events/new'
+    | '/teams/$id'
     | '/admin/organizations/$id'
+    | '/events/$id/attendance'
     | '/events/$id/manage'
     | '/events/$id/registrations'
     | '/events/$slug/register'
@@ -415,6 +449,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-registrations'
     | '/_authenticated/notifications'
     | '/_authenticated/profile'
+    | '/_authenticated/scan'
     | '/events/$slug'
     | '/profile/$username'
     | '/verify/$code'
@@ -428,7 +463,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/user-approvals'
     | '/_authenticated/admin/users'
     | '/_authenticated/events/new'
+    | '/_authenticated/teams/$id'
     | '/_authenticated/admin/organizations/$id'
+    | '/_authenticated/events/$id/attendance'
     | '/_authenticated/events/$id/manage'
     | '/_authenticated/events/$id/registrations'
     | '/_authenticated/events/$slug/register'
@@ -523,6 +560,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/scan': {
+      id: '/_authenticated/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof AuthenticatedScanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -592,6 +636,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/.mcp/list-tools'
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/teams/$id': {
+      id: '/_authenticated/teams/$id'
+      path: '/teams/$id'
+      fullPath: '/teams/$id'
+      preLoaderRoute: typeof AuthenticatedTeamsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/events/new': {
       id: '/_authenticated/events/new'
@@ -677,6 +728,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsIdManageRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events/$id/attendance': {
+      id: '/_authenticated/events/$id/attendance'
+      path: '/events/$id/attendance'
+      fullPath: '/events/$id/attendance'
+      preLoaderRoute: typeof AuthenticatedEventsIdAttendanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/organizations/$id': {
       id: '/_authenticated/admin/organizations/$id'
       path: '/$id'
@@ -711,6 +769,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyRegistrationsRoute: typeof AuthenticatedMyRegistrationsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRoute
   AuthenticatedAdminDelegationsRoute: typeof AuthenticatedAdminDelegationsRoute
   AuthenticatedAdminOrganizationsRoute: typeof AuthenticatedAdminOrganizationsRouteWithChildren
@@ -718,6 +777,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminUserApprovalsRoute: typeof AuthenticatedAdminUserApprovalsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute
+  AuthenticatedTeamsIdRoute: typeof AuthenticatedTeamsIdRoute
+  AuthenticatedEventsIdAttendanceRoute: typeof AuthenticatedEventsIdAttendanceRoute
   AuthenticatedEventsIdManageRoute: typeof AuthenticatedEventsIdManageRoute
   AuthenticatedEventsIdRegistrationsRoute: typeof AuthenticatedEventsIdRegistrationsRoute
   AuthenticatedEventsSlugRegisterRoute: typeof AuthenticatedEventsSlugRegisterRoute
@@ -732,6 +793,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyRegistrationsRoute: AuthenticatedMyRegistrationsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedAdminApprovalsRoute: AuthenticatedAdminApprovalsRoute,
   AuthenticatedAdminDelegationsRoute: AuthenticatedAdminDelegationsRoute,
   AuthenticatedAdminOrganizationsRoute:
@@ -740,6 +802,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminUserApprovalsRoute: AuthenticatedAdminUserApprovalsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
+  AuthenticatedTeamsIdRoute: AuthenticatedTeamsIdRoute,
+  AuthenticatedEventsIdAttendanceRoute: AuthenticatedEventsIdAttendanceRoute,
   AuthenticatedEventsIdManageRoute: AuthenticatedEventsIdManageRoute,
   AuthenticatedEventsIdRegistrationsRoute:
     AuthenticatedEventsIdRegistrationsRoute,
