@@ -94,22 +94,22 @@ function DelegationsPage() {
   if (rows.isError)
     return (
       <main className="container mx-auto px-4 py-8">
-        <p className="text-sm text-destructive">
-          {(rows.error as Error).message === "Forbidden"
-            ? "Admins only."
-            : "Failed to load."}
-        </p>
+        <ErrorState
+          title={(rows.error as Error).message === "Forbidden" ? "Admins only" : "Failed to load"}
+          description={(rows.error as Error).message}
+        />
       </main>
     );
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Permission delegations</h1>
-        <p className="text-sm text-muted-foreground">
-          Grant time-boxed scoped roles. Revocation is immediate.
-        </p>
-      </div>
+      <PageHeader
+        breadcrumbs={[{ label: "Admin", to: "/admin/users" }, { label: "Delegations" }]}
+        title="Permission delegations"
+        subtitle="Grant time-boxed scoped roles. Revocation is immediate."
+      />
+
+
 
       <Card>
         <CardHeader>
