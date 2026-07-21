@@ -1,18 +1,23 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { createEvent } from "@/lib/events.functions";
+import { createEvent, updateEvent } from "@/lib/events.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Upload, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/events/new")({
   head: () => ({ meta: [{ title: "New Event — Utsav" }] }),
   component: NewEvent,
 });
+
+const COVER_MAX_MB = 5;
+const COVER_ACCEPT = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
 function NewEvent() {
   const router = useRouter();
