@@ -118,13 +118,28 @@ function EventDetail() {
     queryFn: () => annFn({ data: { event_id: e!.id } }),
     enabled: !!e?.id,
   });
+  const linksFn = useServerFn(listEventLinks);
+  const links = useQuery({
+    queryKey: ["event-links", e?.id],
+    queryFn: () => linksFn({ data: { event_id: e!.id } }),
+    enabled: !!e?.id,
+  });
   const uid = useSignedInUserId();
   if (!e) return null;
+  const isCancelled = e.status === "cancelled";
 
   return (
     <>
     <BackBar />
     <main className="container mx-auto max-w-4xl px-4 py-10 space-y-8">
+      {isCancelled && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
+          <div className="font-semibold text-destructive">This event has been cancelled.</div>
+          {e.cancel_reason && (
+            <p className="mt-1 text-muted-foreground">{e.cancel_reason}</p>
+          )}
+        </div>
+      )}
       {e.cover_image_url && (
         <div className="aspect-[16/7] overflow-hidden rounded-2xl bg-muted">
           <img src={e.cover_image_url} alt="" className="h-full w-full object-cover" />
