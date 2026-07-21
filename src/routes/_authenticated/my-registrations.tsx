@@ -73,44 +73,8 @@ function MyRegs() {
             }
           />
         )}
-        {q.data?.map((r) => {
-          const ev = (r.event as unknown as { slug: string; title: string; start_at: string | null } | null);
+        {q.data?.map((r) => <RegRow key={r.id} reg={r} onCancel={() => cancelM.mutate(r.id)} cancelling={cancelM.isPending} />)}
 
-          return (
-            <Card key={r.id}>
-              <CardContent className="flex flex-col justify-between gap-4 py-4 sm:flex-row sm:items-center">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={statusBadge(r.status)}>{r.status.replace("_", " ")}</Badge>
-                    {r.payment_status !== "not_required" && (
-                      <Badge variant="outline">Payment: {r.payment_status}</Badge>
-                    )}
-                  </div>
-                  <div className="mt-2 font-medium">{ev?.title ?? "Event"}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {ev?.start_at ? new Date(ev.start_at).toLocaleString() : "Date TBA"}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  {ev?.slug && (
-                    <Link
-                      to="/events/$slug"
-                      params={{ slug: ev.slug }}
-                      className="inline-flex h-9 items-center rounded-md border px-3 text-sm hover:bg-muted"
-                    >
-                      View
-                    </Link>
-                  )}
-                  {r.status !== "cancelled" && r.status !== "checked_in" && (
-                    <Button variant="outline" size="sm" onClick={() => cancelM.mutate(r.id)} disabled={cancelM.isPending}>
-                      Cancel
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
       </div>
     </main>
   );
