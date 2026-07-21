@@ -20,6 +20,7 @@ export function toCsv(rows: Row[], columns?: string[]): string {
 }
 
 export async function toXlsx(rows: Row[], sheetName: string, columns?: string[]): Promise<Buffer> {
+  const { default: ExcelJS } = await import("exceljs");
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet(sheetName.substring(0, 31) || "Sheet1");
   const cols = columns ?? (rows[0] ? Object.keys(rows[0]) : []);
