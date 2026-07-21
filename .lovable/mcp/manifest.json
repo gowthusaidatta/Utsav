@@ -1202,7 +1202,7 @@
       {
         "name": "approve_registration",
         "title": "Approve registration",
-        "description": "Move a registration to 'registered' status (used to promote from waitlist). Requires manage-teams permission.",
+        "description": "Move a registration to 'registered' status (used to promote from waitlist). Requires manage-teams permission on the event.",
         "annotations": {
           "readOnlyHint": false,
           "destructiveHint": false,
