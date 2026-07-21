@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket, Plus } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Header() {
   const { user, loading } = useSession();
@@ -46,6 +47,7 @@ export function Header() {
           <span>Utsav</span>
         </Link>
         <nav className="flex items-center gap-2">
+          <ThemeToggle />
           {loading ? null : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
