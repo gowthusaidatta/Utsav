@@ -254,11 +254,16 @@ function DelegationsPage() {
               })}
               {(rows.data ?? []).length === 0 && !rows.isLoading && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
-                    No delegations yet.
+                  <TableCell colSpan={6}>
+                    <EmptyState
+                      icon={<KeyRound className="h-6 w-6" />}
+                      title="No delegations yet"
+                      description="Grant a time-boxed role above to delegate access."
+                    />
                   </TableCell>
                 </TableRow>
               )}
+
             </TableBody>
           </Table>
         </CardContent>
