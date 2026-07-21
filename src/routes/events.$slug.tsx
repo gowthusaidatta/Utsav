@@ -84,34 +84,67 @@ function fmt(iso: string | null) {
   });
 }
 
+function useSignedInUserId() {
+  const [uid, setUid] = useState<string | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (mounted) setUid(data.user?.id ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setUid(s?.user?.id ?? null);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+  return uid;
+}
+
 function EventDetail() {
   const { slug } = Route.useParams();
   const { data: e } = useSuspenseQuery(eventBySlug(slug));
+  const faqsFn = useServerFn(listEventFaqs);
+  const annFn = useServerFn(listEventAnnouncements);
+  const faqs = useQuery({
+    queryKey: ["faqs", e?.id],
+    queryFn: () => faqsFn({ data: { event_id: e!.id } }),
+    enabled: !!e?.id,
+  });
+  const announcements = useQuery({
+    queryKey: ["announcements", e?.id],
+    queryFn: () => annFn({ data: { event_id: e!.id } }),
+    enabled: !!e?.id,
+  });
+  const uid = useSignedInUserId();
   if (!e) return null;
 
   return (
     <>
     <BackBar />
-    <main className="container mx-auto max-w-4xl px-4 py-10">
+    <main className="container mx-auto max-w-4xl px-4 py-10 space-y-8">
       {e.cover_image_url && (
-        <div className="mb-6 aspect-[16/7] overflow-hidden rounded-2xl bg-muted">
+        <div className="aspect-[16/7] overflow-hidden rounded-2xl bg-muted">
           <img src={e.cover_image_url} alt="" className="h-full w-full object-cover" />
         </div>
       )}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        {e.category && <Badge variant="secondary">{e.category}</Badge>}
-        {e.tags?.map((t: string) => (
-          <Badge key={t} variant="outline">
-            #{t}
-          </Badge>
-        ))}
+      <div>
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          {e.category && <Badge variant="secondary">{e.category}</Badge>}
+          {e.tags?.map((t: string) => (
+            <Badge key={t} variant="outline">
+              #{t}
+            </Badge>
+          ))}
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{e.title}</h1>
+        {e.description && (
+          <p className="mt-4 whitespace-pre-wrap text-muted-foreground">{e.description}</p>
+        )}
       </div>
-      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{e.title}</h1>
-      {e.description && (
-        <p className="mt-4 whitespace-pre-wrap text-muted-foreground">{e.description}</p>
-      )}
 
-      <Card className="mt-8">
+      <Card>
         <CardContent className="grid gap-4 py-6 sm:grid-cols-2">
           <InfoRow icon={<Calendar className="h-4 w-4" />} label="Starts" value={fmt(e.start_at)} />
           <InfoRow icon={<Clock className="h-4 w-4" />} label="Ends" value={fmt(e.end_at)} />
@@ -138,7 +171,7 @@ function EventDetail() {
         </CardContent>
       </Card>
 
-      <div className="mt-8 flex gap-3">
+      <div className="flex gap-3">
         <Link
           to="/events/$slug/register"
           params={{ slug: e.slug }}
@@ -150,6 +183,54 @@ function EventDetail() {
           Share
         </Button>
       </div>
+
+      {(announcements.data ?? []).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Megaphone className="h-4 w-4 text-primary" /> Announcements
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {announcements.data!.map((a) => (
+              <div key={a.id} className="border-b pb-3 last:border-0">
+                <div className="flex items-center gap-2">
+                  {a.is_pinned && <Pin className="h-3.5 w-3.5 text-primary" />}
+                  <h3 className="font-medium">{a.title}</h3>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(a.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+                <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
+                  {a.body}
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {(faqs.data ?? []).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Frequently asked questions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Accordion type="single" collapsible>
+              {faqs.data!.map((f) => (
+                <AccordionItem key={f.id} value={f.id}>
+                  <AccordionTrigger className="text-left">{f.question}</AccordionTrigger>
+                  <AccordionContent className="whitespace-pre-wrap text-muted-foreground">
+                    {f.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </CardContent>
+        </Card>
+      )}
+
+      <EventFeedback eventId={e.id} canReview={!!uid} />
     </main>
     </>
   );
