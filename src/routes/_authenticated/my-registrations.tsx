@@ -44,25 +44,34 @@ function MyRegs() {
   });
 
   return (
-    <main className="container mx-auto max-w-4xl px-4 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">My registrations</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Track events you've signed up for.</p>
+    <main className="container mx-auto max-w-4xl px-4 py-6">
+      <PageHeader
+        icon={<Ticket className="h-5 w-5" />}
+        breadcrumbs={[
+          { label: "Dashboard", to: "/dashboard" },
+          { label: "My registrations" },
+        ]}
+        title="My registrations"
+        subtitle="Track events you've signed up for."
+      />
 
-      <div className="mt-8 space-y-3">
-        {q.isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+      <div className="mt-2 space-y-3">
+        {q.isLoading && <ListSkeleton rows={3} />}
         {q.data && q.data.length === 0 && (
-          <Card>
-            <CardContent className="py-10 text-center">
-              <Calendar className="mx-auto h-10 w-10 text-muted-foreground" />
-              <p className="mt-3 text-sm text-muted-foreground">No registrations yet.</p>
-              <Link to="/events" className="mt-3 inline-block text-sm text-primary hover:underline">
-                Browse events →
-              </Link>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={<Calendar className="h-5 w-5" />}
+            title="No registrations yet"
+            description="Browse events and sign up to see them here."
+            action={
+              <Button asChild size="sm">
+                <Link to="/events">Browse events</Link>
+              </Button>
+            }
+          />
         )}
         {q.data?.map((r) => {
           const ev = (r.event as unknown as { slug: string; title: string; start_at: string | null } | null);
+
           return (
             <Card key={r.id}>
               <CardContent className="flex flex-col justify-between gap-4 py-4 sm:flex-row sm:items-center">
