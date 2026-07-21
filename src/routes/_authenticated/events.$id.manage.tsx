@@ -355,13 +355,11 @@ function ManageEvent() {
                 maxLength={160}
               />
             </F>
-            <F label="Cover image URL">
-              <Input
+            <F label="Cover image">
+              <EventCoverUpload
+                eventId={id}
                 value={form.cover_image_url}
-                onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })}
-                placeholder="https://…"
-                type="url"
-                maxLength={500}
+                onChange={(url) => setForm({ ...form, cover_image_url: url })}
               />
             </F>
             <F label="Description">
