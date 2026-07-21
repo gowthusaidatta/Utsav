@@ -50,6 +50,59 @@ export type Database = {
         }
         Relationships: []
       }
+      certificate_templates: {
+        Row: {
+          background_mime: string | null
+          background_url: string
+          created_at: string
+          created_by: string
+          event_id: string
+          height_px: number
+          id: string
+          is_active: boolean
+          name: string
+          placeholders: Json
+          updated_at: string
+          width_px: number
+        }
+        Insert: {
+          background_mime?: string | null
+          background_url: string
+          created_at?: string
+          created_by: string
+          event_id: string
+          height_px?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          placeholders?: Json
+          updated_at?: string
+          width_px?: number
+        }
+        Update: {
+          background_mime?: string | null
+          background_url?: string
+          created_at?: string
+          created_by?: string
+          event_id?: string
+          height_px?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          placeholders?: Json
+          updated_at?: string
+          width_px?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_templates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
           code: string
@@ -59,10 +112,16 @@ export type Database = {
           issued_at: string
           issued_by: string
           metadata: Json
+          position: string | null
+          rank: number | null
           revoked_at: string | null
           revoked_reason: string | null
+          role: string | null
+          score: number | null
           storage_path: string | null
+          template_id: string | null
           template_key: string
+          title: string | null
           updated_at: string
           user_id: string
           variables: Json
@@ -76,10 +135,16 @@ export type Database = {
           issued_at?: string
           issued_by: string
           metadata?: Json
+          position?: string | null
+          rank?: number | null
           revoked_at?: string | null
           revoked_reason?: string | null
+          role?: string | null
+          score?: number | null
           storage_path?: string | null
+          template_id?: string | null
           template_key?: string
+          title?: string | null
           updated_at?: string
           user_id: string
           variables?: Json
@@ -93,10 +158,16 @@ export type Database = {
           issued_at?: string
           issued_by?: string
           metadata?: Json
+          position?: string | null
+          rank?: number | null
           revoked_at?: string | null
           revoked_reason?: string | null
+          role?: string | null
+          score?: number | null
           storage_path?: string | null
+          template_id?: string | null
           template_key?: string
+          title?: string | null
           updated_at?: string
           user_id?: string
           variables?: Json
@@ -108,6 +179,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -602,69 +680,219 @@ export type Database = {
       profiles: {
         Row: {
           academic_year: string | null
+          address_city: string | null
+          address_country: string | null
+          address_district: string | null
+          address_postal_code: string | null
+          address_state: string | null
+          admission_year: string | null
+          alternate_phone: string | null
           avatar_url: string | null
+          bio: string | null
+          blood_group: string | null
+          branch: string | null
+          campus: string | null
+          codechef_username: string | null
+          codeforces_username: string | null
           college: string | null
+          course: string | null
+          cover_url: string | null
           created_at: string
+          current_position: string | null
+          current_status: string
+          current_year: string | null
+          date_of_birth: string | null
           department: string | null
           designation: string | null
           desired_role: Database["public"]["Enums"]["app_role"] | null
+          discord_username: string | null
+          display_name: string | null
           email: string
           employee_id: string | null
+          expected_graduation: string | null
+          experience_years: number | null
+          facebook_url: string | null
           faculty_id: string | null
+          field_visibility: Json
           full_name: string | null
+          gender: string | null
+          gfg_username: string | null
+          github_url: string | null
+          hackerrank_username: string | null
           id: string
+          instagram_url: string | null
           is_active: boolean
+          languages: string[]
+          leetcode_username: string | null
+          linkedin_url: string | null
+          nationality: string | null
+          orcid: string | null
+          organization_name: string | null
+          personal_website: string | null
           phone: string | null
+          portfolio_url: string | null
+          profile_is_public: boolean
+          registration_number: string | null
           rejection_reason: string | null
+          researchgate_url: string | null
+          resume_url: string | null
           roll_number: string | null
           section: string | null
+          semester: string | null
+          soft_skills: string[]
+          specialization: string | null
+          student_id: string | null
+          technical_skills: string[]
+          timezone: string | null
+          twitter_url: string | null
           updated_at: string
+          username: string | null
           verification_status: string
           verified_at: string | null
           verified_by: string | null
         }
         Insert: {
           academic_year?: string | null
+          address_city?: string | null
+          address_country?: string | null
+          address_district?: string | null
+          address_postal_code?: string | null
+          address_state?: string | null
+          admission_year?: string | null
+          alternate_phone?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          blood_group?: string | null
+          branch?: string | null
+          campus?: string | null
+          codechef_username?: string | null
+          codeforces_username?: string | null
           college?: string | null
+          course?: string | null
+          cover_url?: string | null
           created_at?: string
+          current_position?: string | null
+          current_status?: string
+          current_year?: string | null
+          date_of_birth?: string | null
           department?: string | null
           designation?: string | null
           desired_role?: Database["public"]["Enums"]["app_role"] | null
+          discord_username?: string | null
+          display_name?: string | null
           email: string
           employee_id?: string | null
+          expected_graduation?: string | null
+          experience_years?: number | null
+          facebook_url?: string | null
           faculty_id?: string | null
+          field_visibility?: Json
           full_name?: string | null
+          gender?: string | null
+          gfg_username?: string | null
+          github_url?: string | null
+          hackerrank_username?: string | null
           id: string
+          instagram_url?: string | null
           is_active?: boolean
+          languages?: string[]
+          leetcode_username?: string | null
+          linkedin_url?: string | null
+          nationality?: string | null
+          orcid?: string | null
+          organization_name?: string | null
+          personal_website?: string | null
           phone?: string | null
+          portfolio_url?: string | null
+          profile_is_public?: boolean
+          registration_number?: string | null
           rejection_reason?: string | null
+          researchgate_url?: string | null
+          resume_url?: string | null
           roll_number?: string | null
           section?: string | null
+          semester?: string | null
+          soft_skills?: string[]
+          specialization?: string | null
+          student_id?: string | null
+          technical_skills?: string[]
+          timezone?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          username?: string | null
           verification_status?: string
           verified_at?: string | null
           verified_by?: string | null
         }
         Update: {
           academic_year?: string | null
+          address_city?: string | null
+          address_country?: string | null
+          address_district?: string | null
+          address_postal_code?: string | null
+          address_state?: string | null
+          admission_year?: string | null
+          alternate_phone?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          blood_group?: string | null
+          branch?: string | null
+          campus?: string | null
+          codechef_username?: string | null
+          codeforces_username?: string | null
           college?: string | null
+          course?: string | null
+          cover_url?: string | null
           created_at?: string
+          current_position?: string | null
+          current_status?: string
+          current_year?: string | null
+          date_of_birth?: string | null
           department?: string | null
           designation?: string | null
           desired_role?: Database["public"]["Enums"]["app_role"] | null
+          discord_username?: string | null
+          display_name?: string | null
           email?: string
           employee_id?: string | null
+          expected_graduation?: string | null
+          experience_years?: number | null
+          facebook_url?: string | null
           faculty_id?: string | null
+          field_visibility?: Json
           full_name?: string | null
+          gender?: string | null
+          gfg_username?: string | null
+          github_url?: string | null
+          hackerrank_username?: string | null
           id?: string
+          instagram_url?: string | null
           is_active?: boolean
+          languages?: string[]
+          leetcode_username?: string | null
+          linkedin_url?: string | null
+          nationality?: string | null
+          orcid?: string | null
+          organization_name?: string | null
+          personal_website?: string | null
           phone?: string | null
+          portfolio_url?: string | null
+          profile_is_public?: boolean
+          registration_number?: string | null
           rejection_reason?: string | null
+          researchgate_url?: string | null
+          resume_url?: string | null
           roll_number?: string | null
           section?: string | null
+          semester?: string | null
+          soft_skills?: string[]
+          specialization?: string | null
+          student_id?: string | null
+          technical_skills?: string[]
+          timezone?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          username?: string | null
           verification_status?: string
           verified_at?: string | null
           verified_by?: string | null
@@ -843,6 +1071,135 @@ export type Database = {
           },
         ]
       }
+      user_education: {
+        Row: {
+          achievements: string | null
+          branch: string | null
+          cgpa: number | null
+          course: string | null
+          created_at: string
+          currently_studying: boolean
+          degree: string | null
+          description: string | null
+          documents: Json
+          end_date: string | null
+          id: string
+          institution: string
+          percentage: number | null
+          sort_order: number
+          specialization: string | null
+          start_date: string | null
+          subjects: string[]
+          transcript_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          achievements?: string | null
+          branch?: string | null
+          cgpa?: number | null
+          course?: string | null
+          created_at?: string
+          currently_studying?: boolean
+          degree?: string | null
+          description?: string | null
+          documents?: Json
+          end_date?: string | null
+          id?: string
+          institution: string
+          percentage?: number | null
+          sort_order?: number
+          specialization?: string | null
+          start_date?: string | null
+          subjects?: string[]
+          transcript_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          achievements?: string | null
+          branch?: string | null
+          cgpa?: number | null
+          course?: string | null
+          created_at?: string
+          currently_studying?: boolean
+          degree?: string | null
+          description?: string | null
+          documents?: Json
+          end_date?: string | null
+          id?: string
+          institution?: string
+          percentage?: number | null
+          sort_order?: number
+          specialization?: string | null
+          start_date?: string | null
+          subjects?: string[]
+          transcript_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_pursuits: {
+        Row: {
+          attachments: Json
+          badge_url: string | null
+          created_at: string
+          credential_id: string | null
+          credential_url: string | null
+          description: string | null
+          expiry_date: string | null
+          id: string
+          issue_date: string | null
+          issuing_organization: string | null
+          skills: string[]
+          sort_order: number
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+          verification_url: string | null
+        }
+        Insert: {
+          attachments?: Json
+          badge_url?: string | null
+          created_at?: string
+          credential_id?: string | null
+          credential_url?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          issuing_organization?: string | null
+          skills?: string[]
+          sort_order?: number
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+          verification_url?: string | null
+        }
+        Update: {
+          attachments?: Json
+          badge_url?: string | null
+          created_at?: string
+          credential_id?: string | null
+          credential_url?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          issuing_organization?: string | null
+          skills?: string[]
+          sort_order?: number
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+          verification_url?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           expires_at: string | null
@@ -876,6 +1233,27 @@ export type Database = {
         }
         Relationships: []
       }
+      username_history: {
+        Row: {
+          changed_at: string
+          id: string
+          old_username: string
+          user_id: string
+        }
+        Insert: {
+          changed_at?: string
+          id?: string
+          old_username: string
+          user_id: string
+        }
+        Update: {
+          changed_at?: string
+          id?: string
+          old_username?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -897,6 +1275,7 @@ export type Database = {
         Args: { _actor: string; _target: string }
         Returns: boolean
       }
+      get_public_profile: { Args: { _username: string }; Returns: Json }
       has_any_global_role: {
         Args: { _roles: string[]; _uid: string }
         Returns: boolean
