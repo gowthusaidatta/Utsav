@@ -137,6 +137,7 @@ function EventDetail() {
         </Button>
       </div>
     </main>
+    </>
   );
 }
 
