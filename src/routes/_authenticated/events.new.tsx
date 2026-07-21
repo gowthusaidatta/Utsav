@@ -48,7 +48,6 @@ function NewEvent() {
     setCoverFile(null);
     setCoverPreview("");
   }
-  const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
     title: "",
     description: "",
