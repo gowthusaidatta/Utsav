@@ -92,7 +92,7 @@ export function EventFeedback({ eventId, canReview }: Props) {
     onSuccess: () => {
       setRating(0);
       setComment("");
-      initialized[1](false);
+      setInitialized(false);
       qc.invalidateQueries({ queryKey: ["fb-sum", eventId] });
       qc.invalidateQueries({ queryKey: ["fb-list", eventId] });
       qc.invalidateQueries({ queryKey: ["fb-mine", eventId] });
