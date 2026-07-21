@@ -505,6 +505,7 @@ function ManageEvent() {
 
       <ManageAnnouncements eventId={id} />
       <ManageFaqs eventId={id} />
+      <EventLinksEditor eventId={id} />
     </main>
   );
 }
