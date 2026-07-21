@@ -32,7 +32,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { X } from "lucide-react";
+import { X, Users } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
+import { ErrorState } from "@/components/EmptyState";
+
 
 import { APP_ROLES, ROLE_LABELS } from "@/lib/rbac-matrix";
 const ROLES = APP_ROLES;
@@ -87,24 +90,41 @@ function AdminUsersPage() {
 
   if (users.isError) {
     return (
-      <main className="container mx-auto px-4 py-8">
-        <p className="text-destructive">
-          {(users.error as Error).message === "Forbidden"
-            ? "You don't have permission to view this page."
-            : "Failed to load users."}
-        </p>
+      <main className="container mx-auto px-4 py-6 space-y-6">
+        <PageHeader
+          icon={<Users className="h-5 w-5" />}
+          breadcrumbs={[
+            { label: "Dashboard", to: "/dashboard" },
+            { label: "Admin" },
+            { label: "Users" },
+          ]}
+          title="Users & roles"
+        />
+        <ErrorState
+          description={
+            (users.error as Error).message === "Forbidden"
+              ? "You don't have permission to view this page."
+              : "Failed to load users."
+          }
+        />
       </main>
     );
   }
 
   return (
-    <main className="container mx-auto px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Users & roles</h1>
-        <p className="text-sm text-muted-foreground">
-          Admin-only view. Grant or revoke global roles.
-        </p>
-      </div>
+    <main className="container mx-auto px-4 py-6 space-y-6">
+      <PageHeader
+        icon={<Users className="h-5 w-5" />}
+        breadcrumbs={[
+          { label: "Dashboard", to: "/dashboard" },
+          { label: "Admin" },
+          { label: "Users" },
+        ]}
+        title="Users & roles"
+        subtitle="Admin-only view. Grant or revoke global roles."
+      />
+
+
 
       <Card>
         <CardHeader>

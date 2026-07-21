@@ -5,7 +5,10 @@ import { listPendingApproval, changeEventStatus } from "@/lib/events.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle, Calendar } from "lucide-react";
+import { CheckCircle2, XCircle, Calendar, ShieldCheck } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
+import { EmptyState, ErrorState, ListSkeleton } from "@/components/EmptyState";
+
 
 export const Route = createFileRoute("/_authenticated/admin/approvals")({
   head: () => ({ meta: [{ title: "Event Approvals — Utsav" }] }),
@@ -30,29 +33,37 @@ function Approvals() {
   }
 
   return (
-    <main className="container mx-auto max-w-4xl px-4 py-8">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Event approvals</h1>
-        <p className="text-sm text-muted-foreground">
-          Events submitted by organizers awaiting faculty or admin approval.
-        </p>
-      </header>
+    <main className="container mx-auto max-w-4xl px-4 py-6">
+      <PageHeader
+        icon={<ShieldCheck className="h-5 w-5" />}
+        breadcrumbs={[
+          { label: "Dashboard", to: "/dashboard" },
+          { label: "Admin" },
+          { label: "Event approvals" },
+        ]}
+        title="Event approvals"
+        subtitle="Events submitted by organizers awaiting faculty or admin approval."
+      />
 
       {q.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <ListSkeleton rows={3} />
       ) : q.error ? (
-        <Card>
-          <CardContent className="py-8 text-sm text-destructive">
-            {q.error instanceof Error ? q.error.message : "Unable to load queue."}
-          </CardContent>
-        </Card>
+        <ErrorState
+          description={q.error instanceof Error ? q.error.message : "Unable to load queue."}
+          action={
+            <Button variant="outline" size="sm" onClick={() => q.refetch()}>
+              Retry
+            </Button>
+          }
+        />
       ) : (q.data ?? []).length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-sm text-muted-foreground">
-            Nothing pending. All caught up.
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<CheckCircle2 className="h-5 w-5" />}
+          title="Nothing pending"
+          description="All events have been reviewed."
+        />
       ) : (
+
         <div className="space-y-3">
           {q.data!.map((e) => (
             <Card key={e.id}>

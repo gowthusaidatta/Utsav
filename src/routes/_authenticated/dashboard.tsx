@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShieldCheck, User, Plus, CalendarDays } from "lucide-react";
+import { ShieldCheck, User, Plus, CalendarDays, LayoutDashboard } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Utsav" }] }),
@@ -30,29 +31,30 @@ function Dashboard() {
   );
 
   return (
-    <main className="container mx-auto px-4 py-8 space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Welcome{profile.data?.full_name ? `, ${profile.data.full_name}` : ""}
-          </h1>
-          <p className="text-sm text-muted-foreground">Your Utsav dashboard.</p>
-        </div>
-        <div className="flex gap-2">
-          {canCreateEvent && (
-            <Button asChild>
-              <Link to="/events/new">
-                <Plus className="mr-2 h-4 w-4" /> New event
+    <main className="container mx-auto px-4 py-6 space-y-6">
+      <PageHeader
+        icon={<LayoutDashboard className="h-5 w-5" />}
+        breadcrumbs={[{ label: "Dashboard" }]}
+        title={`Welcome${profile.data?.full_name ? `, ${profile.data.full_name}` : ""}`}
+        subtitle="Your Utsav dashboard."
+        actions={
+          <>
+            {canCreateEvent && (
+              <Button asChild size="sm">
+                <Link to="/events/new">
+                  <Plus className="mr-2 h-4 w-4" /> New event
+                </Link>
+              </Button>
+            )}
+            <Button asChild size="sm" variant="outline">
+              <Link to="/my-events">
+                <CalendarDays className="mr-2 h-4 w-4" /> My events
               </Link>
             </Button>
-          )}
-          <Button asChild variant="outline">
-            <Link to="/my-events">
-              <CalendarDays className="mr-2 h-4 w-4" /> My events
-            </Link>
-          </Button>
-        </div>
-      </div>
+          </>
+        }
+      />
+
 
 
       <div className="grid gap-4 md:grid-cols-2">

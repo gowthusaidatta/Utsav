@@ -7,7 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Calendar } from "lucide-react";
+import { Plus, Calendar, CalendarDays } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
+import { EmptyState, ListSkeleton } from "@/components/EmptyState";
+
 import {
   Select,
   SelectContent,
@@ -64,60 +67,63 @@ function MyEvents() {
   });
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">My events</h1>
-          <p className="text-sm text-muted-foreground">
-            Events you own, organize, coordinate, judge, or volunteer for.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {STATUSES.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s === "all" ? "All statuses" : s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button asChild>
-            <Link to="/events/new">
-              <Plus className="mr-2 h-4 w-4" /> New event
-            </Link>
-          </Button>
-        </div>
-      </div>
+    <main className="container mx-auto px-4 py-6">
+      <PageHeader
+        icon={<CalendarDays className="h-5 w-5" />}
+        breadcrumbs={[
+          { label: "Dashboard", to: "/dashboard" },
+          { label: "My events" },
+        ]}
+        title="My events"
+        subtitle="Events you own, organize, coordinate, judge, or volunteer for."
+        actions={
+          <>
+            <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s === "all" ? "All statuses" : s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button asChild size="sm">
+              <Link to="/events/new">
+                <Plus className="mr-2 h-4 w-4" /> New event
+              </Link>
+            </Button>
+          </>
+        }
+      />
 
       {q.isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-40" />
-          ))}
-        </div>
+        <ListSkeleton rows={3} />
       ) : (q.data ?? []).length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-sm text-muted-foreground">
-            {status === "all" ? (
-              <>
-                You don't have any events yet.{" "}
-                <Link to="/events/new" className="text-primary hover:underline">
-                  Create your first event
+        <EmptyState
+          icon={<Calendar className="h-5 w-5" />}
+          title={status === "all" ? "No events yet" : `No events with status "${status}"`}
+          description={
+            status === "all"
+              ? "Create your first event to get started."
+              : "Try a different status filter."
+          }
+          action={
+            status === "all" && (
+              <Button asChild size="sm">
+                <Link to="/events/new">
+                  <Plus className="mr-2 h-4 w-4" /> Create event
                 </Link>
-                .
-              </>
-            ) : (
-              <>No events with status “{status}”.</>
-            )}
-          </CardContent>
-        </Card>
+              </Button>
+            )
+          }
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {q.data!.map((e) => (
+
             <Card key={e.id} className="transition hover:border-primary/40">
               <CardHeader>
                 <div className="flex items-center justify-between gap-2">

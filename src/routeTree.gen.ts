@@ -19,6 +19,7 @@ import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMyRegistrationsRouteImport } from './routes/_authenticated/my-registrations'
 import { Route as AuthenticatedMyEventsRouteImport } from './routes/_authenticated/my-events'
 import { Route as AuthenticatedDelegationsRouteImport } from './routes/_authenticated/delegations'
@@ -88,6 +89,12 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMyRegistrationsRoute =
   AuthenticatedMyRegistrationsRouteImport.update({
     id: '/my-registrations',
@@ -210,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/delegations': typeof AuthenticatedDelegationsRoute
   '/my-events': typeof AuthenticatedMyEventsRoute
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -240,6 +248,7 @@ export interface FileRoutesByTo {
   '/delegations': typeof AuthenticatedDelegationsRoute
   '/my-events': typeof AuthenticatedMyEventsRoute
   '/my-registrations': typeof AuthenticatedMyRegistrationsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -272,6 +281,7 @@ export interface FileRoutesById {
   '/_authenticated/delegations': typeof AuthenticatedDelegationsRoute
   '/_authenticated/my-events': typeof AuthenticatedMyEventsRoute
   '/_authenticated/my-registrations': typeof AuthenticatedMyRegistrationsRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/events/$slug': typeof EventsSlugRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/delegations'
     | '/my-events'
     | '/my-registrations'
+    | '/notifications'
     | '/profile'
     | '/events/$slug'
     | '/verify/$code'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/delegations'
     | '/my-events'
     | '/my-registrations'
+    | '/notifications'
     | '/profile'
     | '/events/$slug'
     | '/verify/$code'
@@ -365,6 +377,7 @@ export interface FileRouteTypes {
     | '/_authenticated/delegations'
     | '/_authenticated/my-events'
     | '/_authenticated/my-registrations'
+    | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/events/$slug'
     | '/verify/$code'
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/my-registrations': {
@@ -628,6 +648,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDelegationsRoute: typeof AuthenticatedDelegationsRoute
   AuthenticatedMyEventsRoute: typeof AuthenticatedMyEventsRoute
   AuthenticatedMyRegistrationsRoute: typeof AuthenticatedMyRegistrationsRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRoute
   AuthenticatedAdminDelegationsRoute: typeof AuthenticatedAdminDelegationsRoute
@@ -646,6 +667,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDelegationsRoute: AuthenticatedDelegationsRoute,
   AuthenticatedMyEventsRoute: AuthenticatedMyEventsRoute,
   AuthenticatedMyRegistrationsRoute: AuthenticatedMyRegistrationsRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedAdminApprovalsRoute: AuthenticatedAdminApprovalsRoute,
   AuthenticatedAdminDelegationsRoute: AuthenticatedAdminDelegationsRoute,
