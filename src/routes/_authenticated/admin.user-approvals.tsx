@@ -205,11 +205,16 @@ function UserApprovalsPage() {
               })}
               {(pending.data ?? []).length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
-                    No pending accounts.
+                  <TableCell colSpan={5}>
+                    <EmptyState
+                      icon={UserCheck}
+                      title="No pending accounts"
+                      description="New Faculty and Coordinator signups will appear here for approval."
+                    />
                   </TableCell>
                 </TableRow>
               )}
+
             </TableBody>
           </Table>
         </CardContent>
