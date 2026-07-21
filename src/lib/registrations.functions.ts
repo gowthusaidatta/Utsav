@@ -110,6 +110,35 @@ export const updateRegistrationStatus = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    // Load the row so we can authorize by event_id / ownership.
+    const { data: reg, error: regErr } = await context.supabase
+      .from("registrations")
+      .select("id, event_id, user_id, status")
+      .eq("id", data.registration_id)
+      .single();
+    if (regErr || !reg) throw new Error("Registration not found");
+
+    const isSelf = reg.user_id === context.userId;
+    // Only staff with manage_teams or check_in on this event may perform privileged transitions.
+    // Attendees may only self-cancel.
+    if (data.status !== "cancelled") {
+      const [{ data: canManage }, { data: canCheckIn }] = await Promise.all([
+        context.supabase.rpc("can", { _uid: context.userId, _action: "manage_teams", _event: reg.event_id }),
+        context.supabase.rpc("can", { _uid: context.userId, _action: "check_in", _event: reg.event_id }),
+      ]);
+      if (!canManage && !canCheckIn) {
+        throw new Error("Forbidden: staff permission required to change registration status");
+      }
+    } else if (!isSelf) {
+      // Non-self cancellations require staff.
+      const { data: canManage } = await context.supabase.rpc("can", {
+        _uid: context.userId,
+        _action: "manage_teams",
+        _event: reg.event_id,
+      });
+      if (!canManage) throw new Error("Forbidden: cannot cancel another user's registration");
+    }
+
     const patch: { status: typeof data.status; checked_in_at?: string } = { status: data.status };
     if (data.status === "checked_in") patch.checked_in_at = new Date().toISOString();
     const { error } = await context.supabase
@@ -126,3 +155,4 @@ export const updateRegistrationStatus = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
