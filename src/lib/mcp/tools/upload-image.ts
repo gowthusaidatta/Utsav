@@ -51,6 +51,9 @@ export default defineTool({
     const scan = scanBuffer(buf);
     if (scan === "infected") return invalidInput("Payload rejected by malware scanner.");
 
+    const ownerCheck = await assertOwnerAllowed(supabase, actor, input.owner_type, input.owner_id);
+    if (!ownerCheck.ok) return forbidden(ownerCheck.message);
+
     if (input.event_id) {
       const allowed = await canManageEvent(supabase, actor, input.event_id);
       if (!allowed) return forbidden("You cannot upload media to this event.");
