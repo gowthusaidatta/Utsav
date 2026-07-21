@@ -22,6 +22,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Check, X, MapPin } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
+
 
 export const Route = createFileRoute("/_authenticated/admin/role-matrix")({
   head: () => ({ meta: [{ title: "Admin · Role Matrix — Utsav" }] }),
