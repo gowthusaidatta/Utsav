@@ -39,16 +39,12 @@ function RoleMatrixPage() {
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Role & permissions matrix</h1>
-        <p className="text-sm text-muted-foreground">
-          The source-of-truth mapping of Utsav's 16 roles to the actions the shared
-          <code className="mx-1 rounded bg-muted px-1">public.can()</code>
-          function authorizes. Every check below is enforced server-side by RLS and
-          the RBAC helpers — this page renders the matrix and lets you verify your
-          own permissions against the live database.
-        </p>
-      </div>
+      <PageHeader
+        breadcrumbs={[{ label: "Admin", to: "/admin/users" }, { label: "Role matrix" }]}
+        title="Role & permissions matrix"
+        subtitle="The source-of-truth mapping of Utsav's 16 roles to authorized actions. Every check is enforced server-side by RLS and the shared public.can() helper."
+      />
+
 
       <Card>
         <CardHeader>
