@@ -28,6 +28,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PageHeader } from "@/components/PageHeader";
+import { EmptyState, ErrorState } from "@/components/EmptyState";
+import { KeyRound } from "lucide-react";
+
+
 
 const ROLES = ["organizer", "coordinator", "judge", "volunteer", "faculty", "admin"] as const;
 const SCOPES = ["global", "organization", "event"] as const;
