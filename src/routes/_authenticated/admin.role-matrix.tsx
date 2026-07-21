@@ -1,18 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { verifyMyPermissions } from "@/lib/authz.functions";
+import { useMemo, useState } from "react";
+import { verifyMyPermissions, listPermissionCatalog } from "@/lib/authz.functions";
 import {
   APP_ROLES,
-  ACTIONS,
-  ACTION_LABELS,
   ROLE_LABELS,
   ROLE_DESCRIPTIONS,
-  MATRIX,
-  type Action,
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+  cellFor,
+  type AppRole,
 } from "@/lib/rbac-matrix";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -24,27 +26,69 @@ import {
 import { Check, X, MapPin } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 
-
 export const Route = createFileRoute("/_authenticated/admin/role-matrix")({
   head: () => ({ meta: [{ title: "Admin · Role Matrix — Utsav" }] }),
   component: RoleMatrixPage,
 });
 
+type CatalogRow = Awaited<ReturnType<typeof listPermissionCatalog>>[number];
+
 function RoleMatrixPage() {
   const verify = useServerFn(verifyMyPermissions);
+  const catalogFn = useServerFn(listPermissionCatalog);
+  const [q, setQ] = useState("");
+
+  const catalog = useQuery({
+    queryKey: ["role-permission-catalog"],
+    queryFn: () => catalogFn(),
+  });
+
   const live = useQuery({
     queryKey: ["role-matrix-verify"],
     queryFn: () => verify({ data: {} }),
   });
+
+  const rolesAll = useMemo(() => [...APP_ROLES, "guest" as const], []);
+  const filter = q.trim().toLowerCase();
+
+  const grouped = useMemo(() => {
+    const rows = (catalog.data ?? []) as CatalogRow[];
+    const buckets = new Map<string, CatalogRow[]>();
+    for (const r of rows) {
+      if (
+        filter &&
+        !r.label.toLowerCase().includes(filter) &&
+        !r.action.toLowerCase().includes(filter) &&
+        !r.category.toLowerCase().includes(filter)
+      )
+        continue;
+      const arr = buckets.get(r.category) ?? [];
+      arr.push(r);
+      buckets.set(r.category, arr);
+    }
+    const ordered: Array<{ category: string; rows: CatalogRow[] }> = [];
+    for (const cat of CATEGORY_ORDER) {
+      const rs = buckets.get(cat);
+      if (rs && rs.length) ordered.push({ category: cat, rows: rs });
+    }
+    // any categories not in the canonical order
+    for (const [cat, rs] of buckets) {
+      if (!CATEGORY_ORDER.includes(cat as (typeof CATEGORY_ORDER)[number])) {
+        ordered.push({ category: cat, rows: rs });
+      }
+    }
+    return ordered;
+  }, [catalog.data, filter]);
+
+  const totalActions = (catalog.data ?? []).length;
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-8">
       <PageHeader
         breadcrumbs={[{ label: "Admin", to: "/admin/users" }, { label: "Role matrix" }]}
         title="Role & permissions matrix"
-        subtitle="The source-of-truth mapping of Utsav's 16 roles to authorized actions. Every check is enforced server-side by RLS and the shared public.can() helper."
+        subtitle={`The source-of-truth mapping of Utsav's ${APP_ROLES.length} roles to ${totalActions || "…"} authorized actions. Enforced server-side by public.can() and RLS.`}
       />
-
 
       <Card>
         <CardHeader>
@@ -75,28 +119,11 @@ function RoleMatrixPage() {
                   </Badge>
                 )}
               </div>
-              <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-                {ACTIONS.map((a) => {
-                  const allowed = live.data.actions[a];
-                  return (
-                    <div
-                      key={a}
-                      className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
-                    >
-                      <span>{ACTION_LABELS[a]}</span>
-                      {allowed ? (
-                        <Check className="h-4 w-4 text-emerald-600" aria-label="allowed" />
-                      ) : (
-                        <X className="h-4 w-4 text-muted-foreground" aria-label="denied" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
               <p className="text-xs text-muted-foreground">
-                Event-scoped actions (score submissions, mentor teams, per-event
-                check-in) are shown as denied here because no event id is supplied;
-                open a specific event to see scoped permissions.
+                {Object.values(live.data.actions).filter(Boolean).length} of{" "}
+                {Object.keys(live.data.actions).length} actions currently allowed for
+                you (event-scoped actions show as denied here because no event id is
+                supplied).
               </p>
             </div>
           )}
@@ -104,45 +131,78 @@ function RoleMatrixPage() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Full matrix (16 roles × {ACTIONS.length} actions)</CardTitle>
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle>Full matrix ({APP_ROLES.length + 1} roles × {totalActions || "…"} actions)</CardTitle>
+          <Input
+            placeholder="Filter actions…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="sm:w-64"
+          />
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="sticky left-0 bg-background">Action</TableHead>
-                {[...APP_ROLES, "guest"].map((r) => (
-                  <TableHead key={r} className="whitespace-nowrap">
-                    {ROLE_LABELS[r as keyof typeof ROLE_LABELS]}
+          {catalog.isLoading && <p className="text-sm">Loading catalog…</p>}
+          {catalog.error && (
+            <p className="text-sm text-destructive">
+              {(catalog.error as Error).message}
+            </p>
+          )}
+          {catalog.data && (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="sticky left-0 bg-background min-w-[240px]">
+                    Action
                   </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {ACTIONS.map((a) => (
-                <TableRow key={a}>
-                  <TableCell className="sticky left-0 bg-background font-medium">
-                    {ACTION_LABELS[a as Action]}
-                  </TableCell>
-                  {[...APP_ROLES, "guest"].map((r) => {
-                    const cell = MATRIX[r as keyof typeof MATRIX][a as Action];
-                    return (
-                      <TableCell key={r} className="text-center">
-                        {cell === "G" ? (
-                          <Check className="mx-auto h-4 w-4 text-emerald-600" aria-label="allowed globally" />
-                        ) : cell === "E" ? (
-                          <MapPin className="mx-auto h-4 w-4 text-amber-600" aria-label="event-scoped only" />
-                        ) : (
-                          <X className="mx-auto h-4 w-4 text-muted-foreground/60" aria-label="denied" />
-                        )}
-                      </TableCell>
-                    );
-                  })}
+                  {rolesAll.map((r) => (
+                    <TableHead key={r} className="whitespace-nowrap text-center">
+                      {ROLE_LABELS[r]}
+                    </TableHead>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {grouped.map(({ category, rows }) => (
+                  <>
+                    <TableRow key={`h-${category}`} className="bg-muted/40">
+                      <TableCell
+                        colSpan={rolesAll.length + 1}
+                        className="sticky left-0 bg-muted/40 text-xs font-semibold uppercase tracking-wide"
+                      >
+                        {CATEGORY_LABELS[category] ?? category}
+                      </TableCell>
+                    </TableRow>
+                    {rows.map((row) => (
+                      <TableRow key={row.action}>
+                        <TableCell className="sticky left-0 bg-background">
+                          <div className="font-medium">{row.label}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {row.action}
+                            {row.is_public && " · public"}
+                            {row.is_self_service && " · self-service"}
+                          </div>
+                        </TableCell>
+                        {rolesAll.map((r) => {
+                          const cell = cellFor(r as AppRole | "guest", row);
+                          return (
+                            <TableCell key={r} className="text-center">
+                              {cell === "G" ? (
+                                <Check className="mx-auto h-4 w-4 text-emerald-600" aria-label="allowed globally" />
+                              ) : cell === "E" ? (
+                                <MapPin className="mx-auto h-4 w-4 text-amber-600" aria-label="event-scoped only" />
+                              ) : (
+                                <X className="mx-auto h-4 w-4 text-muted-foreground/60" aria-label="denied" />
+                              )}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    ))}
+                  </>
+                ))}
+              </TableBody>
+            </Table>
+          )}
           <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <Check className="h-3 w-3 text-emerald-600" /> Allowed globally
@@ -163,13 +223,11 @@ function RoleMatrixPage() {
         </CardHeader>
         <CardContent>
           <dl className="grid gap-3 md:grid-cols-2">
-            {[...APP_ROLES, "guest"].map((r) => (
+            {rolesAll.map((r) => (
               <div key={r} className="rounded-md border p-3">
-                <dt className="font-medium">
-                  {ROLE_LABELS[r as keyof typeof ROLE_LABELS]}
-                </dt>
+                <dt className="font-medium">{ROLE_LABELS[r]}</dt>
                 <dd className="text-sm text-muted-foreground">
-                  {ROLE_DESCRIPTIONS[r as keyof typeof ROLE_DESCRIPTIONS]}
+                  {ROLE_DESCRIPTIONS[r]}
                 </dd>
               </div>
             ))}
