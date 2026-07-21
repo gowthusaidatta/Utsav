@@ -92,11 +92,25 @@ export const listEventRegistrations = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
       .from("registrations")
-      .select("id, status, payment_status, team_id, checked_in_at, created_at, user_id, user:profiles!registrations_user_id_fkey(id, full_name, email, avatar_url)")
+      .select("id, status, payment_status, team_id, checked_in_at, created_at, user_id")
       .eq("event_id", data.event_id)
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    const registrations = rows ?? [];
+    const userIds = Array.from(new Set(registrations.map((r) => r.user_id)));
+    let profilesById = new Map<
+      string,
+      { id: string; full_name: string | null; email: string | null; avatar_url: string | null }
+    >();
+    if (userIds.length > 0) {
+      const { data: profs, error: pErr } = await context.supabase
+        .from("profiles")
+        .select("id, full_name, email, avatar_url")
+        .in("id", userIds);
+      if (pErr) throw new Error(pErr.message);
+      profilesById = new Map((profs ?? []).map((p) => [p.id, p]));
+    }
+    return registrations.map((r) => ({ ...r, user: profilesById.get(r.user_id) ?? null }));
   });
 
 export const updateRegistrationStatus = createServerFn({ method: "POST" })
