@@ -57,12 +57,11 @@ function ProfilePage() {
   });
 
   return (
-    <main className="container mx-auto max-w-2xl px-4 py-8">
+    <main className="container mx-auto max-w-2xl px-4 py-8 space-y-6">
+      <PageHeader title="Profile" subtitle="Manage your account details." />
       <Card>
-        <CardHeader>
-          <CardTitle>Profile</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
+
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading…</p>
           ) : (
