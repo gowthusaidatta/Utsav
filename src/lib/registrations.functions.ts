@@ -87,12 +87,13 @@ export const myRegistrations = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("registrations")
-      .select("id, status, payment_status, team_id, created_at, event:events(id, slug, title, start_at, cover_image_url)")
+      .select("id, status, payment_status, team_id, qr_token, qr_revoked_at, checked_in_at, created_at, event:events(id, slug, title, start_at, cover_image_url, registration_type)")
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
 
 export const listEventRegistrations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
