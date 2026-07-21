@@ -1,12 +1,14 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { createEvent } from "@/lib/events.functions";
+import { createEvent, updateEvent } from "@/lib/events.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Upload, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/events/new")({
@@ -14,10 +16,38 @@ export const Route = createFileRoute("/_authenticated/events/new")({
   component: NewEvent,
 });
 
+const COVER_MAX_MB = 5;
+const COVER_ACCEPT = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+
 function NewEvent() {
   const router = useRouter();
   const fn = useServerFn(createEvent);
+  const updateFn = useServerFn(updateEvent);
   const [busy, setBusy] = useState(false);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string>("");
+  const [drag, setDrag] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  function pickCover(file: File) {
+    if (!COVER_ACCEPT.includes(file.type)) {
+      toast.error("Use a JPG, PNG, WebP, or AVIF image");
+      return;
+    }
+    if (file.size > COVER_MAX_MB * 1024 * 1024) {
+      toast.error(`Image must be under ${COVER_MAX_MB} MB`);
+      return;
+    }
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
+  }
+
+  function clearCover() {
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+    setCoverFile(null);
+    setCoverPreview("");
+  }
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -64,6 +94,25 @@ function NewEvent() {
         attendance_rule: form.attendance_rule,
       };
       const res = await fn({ data: payload });
+
+      if (coverFile) {
+        try {
+          const { data: userRes } = await supabase.auth.getUser();
+          const uid = userRes.user?.id;
+          if (!uid) throw new Error("Not signed in");
+          const ext = coverFile.name.split(".").pop()?.toLowerCase() || "jpg";
+          const safe = `${Date.now()}.${ext.replace(/[^a-z0-9]/gi, "").slice(0, 5)}`;
+          const path = `${uid}/${res.id}/${safe}`;
+          const { error } = await supabase.storage
+            .from("event-covers")
+            .upload(path, coverFile, { upsert: false, contentType: coverFile.type });
+          if (error) throw error;
+          await updateFn({ data: { id: res.id, cover_image_url: `/api/public/event-covers/${path}` } });
+        } catch (upErr) {
+          toast.error(upErr instanceof Error ? `Cover upload failed: ${upErr.message}` : "Cover upload failed");
+        }
+      }
+
       toast.success("Event created as draft");
       router.navigate({ to: "/events/$id/manage", params: { id: res.id } });
     } catch (err) {
@@ -82,6 +131,58 @@ function NewEvent() {
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={onSubmit}>
+            <Field label="Cover image">
+              {coverPreview ? (
+                <div className="relative overflow-hidden rounded-lg border bg-muted">
+                  <img src={coverPreview} alt="Cover preview" className="aspect-[16/7] w-full object-cover" />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    className="absolute right-2 top-2"
+                    onClick={clearCover}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+                  onDragLeave={() => setDrag(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDrag(false);
+                    const f = e.dataTransfer.files?.[0];
+                    if (f) pickCover(f);
+                  }}
+                  onClick={() => coverInputRef.current?.click()}
+                  className={`flex aspect-[16/7] w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-sm text-muted-foreground transition-colors ${
+                    drag ? "border-primary bg-primary/5" : "border-border"
+                  }`}
+                >
+                  {busy ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    <>
+                      <Upload className="h-6 w-6" />
+                      <div>Drag &amp; drop or click to upload</div>
+                      <div className="text-xs">JPG, PNG, WebP, AVIF · max {COVER_MAX_MB} MB</div>
+                    </>
+                  )}
+                </div>
+              )}
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept={COVER_ACCEPT.join(",")}
+                hidden
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) pickCover(f);
+                  e.target.value = "";
+                }}
+              />
+            </Field>
             <Field label="Title" required>
               <Input
                 required
