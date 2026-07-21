@@ -6,7 +6,7 @@ import {
 } from "../lib/supabase";
 import {
   decodeBase64, sha256, detectMagicMime, scanBuffer,
-  DOC_MIME, MAX_DOC_BYTES, extForMime, signedDownloadUrl,
+  DOC_MIME, MAX_DOC_BYTES, extForMime, signedDownloadUrl, assertOwnerAllowed,
 } from "../lib/media";
 
 export default defineTool({

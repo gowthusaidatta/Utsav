@@ -6,7 +6,7 @@ import {
 } from "../lib/supabase";
 import {
   decodeBase64, sha256, detectMagicMime, scanBuffer,
-  IMAGE_MIME, MAX_IMAGE_BYTES, extForMime, signedDownloadUrl,
+  IMAGE_MIME, MAX_IMAGE_BYTES, extForMime, signedDownloadUrl, assertOwnerAllowed,
 } from "../lib/media";
 
 async function canManageEvent(supabase: import("@supabase/supabase-js").SupabaseClient, uid: string, eventId: string | null) {
