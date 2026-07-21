@@ -36,6 +36,8 @@ export type CertificateInput = {
 };
 
 export async function generateCertificatePdf(input: CertificateInput): Promise<Buffer> {
+  const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
+  const { default: QRCode } = await import("qrcode");
   const pdf = await PDFDocument.create();
   const page = pdf.addPage([842, 595]); // A4 landscape
   const helv = await pdf.embedFont(StandardFonts.Helvetica);
