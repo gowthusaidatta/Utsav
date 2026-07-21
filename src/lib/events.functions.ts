@@ -281,7 +281,7 @@ export const createEvent = createServerFn({ method: "POST" })
         min_team_size: data.min_team_size ?? null,
         max_team_size: data.max_team_size ?? null,
         max_teams: data.max_teams ?? null,
-        team_config: data.team_config ?? {},
+        team_config: (data.team_config ?? {}) as never,
         attendance_rule: data.attendance_rule ?? "member",
         certificate_rule: data.certificate_rule ?? "attended",
       })
