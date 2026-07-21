@@ -76,9 +76,9 @@ product specification. Updated as modules land.
 | Tracks / sessions | 🔴 | |
 | Speakers | 🔴 | |
 | Sponsors / partners | 🔴 | |
-| Rules / FAQs | 🔴 | |
-| Announcements | 🔴 | Notifications infra ready; broadcast UI missing. |
-| Feedback / ratings / reviews | 🔴 | |
+| Rules / FAQs | ✅ | `event_faqs` + manage UI + public accordion. |
+| Announcements | ✅ | `event_announcements` (pinned) + manage UI + public feed. |
+| Feedback / ratings / reviews | ✅ | `event_feedback` 1–5 stars, RLS-gated to registrants. |
 | SEO metadata + OG image | ✅ | Per-route `head()`. |
 
 ## 5. Registrations
