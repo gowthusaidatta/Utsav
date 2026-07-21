@@ -5,7 +5,10 @@ import { listPendingApproval, changeEventStatus } from "@/lib/events.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle, Calendar } from "lucide-react";
+import { CheckCircle2, XCircle, Calendar, ShieldCheck } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
+import { EmptyState, ErrorState, ListSkeleton } from "@/components/EmptyState";
+
 
 export const Route = createFileRoute("/_authenticated/admin/approvals")({
   head: () => ({ meta: [{ title: "Event Approvals — Utsav" }] }),
