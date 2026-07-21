@@ -71,12 +71,13 @@ function OrganizationsPage() {
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Organizations</h1>
-        <p className="text-sm text-muted-foreground">
-          Colleges, departments, clubs and partners that host events on Utsav.
-        </p>
-      </div>
+      <PageHeader
+        breadcrumbs={[{ label: "Admin", to: "/admin/users" }, { label: "Organizations" }]}
+        title="Organizations"
+        subtitle="Colleges, departments, clubs and partners that host events on Utsav."
+      />
+
+
 
       <Card>
         <CardHeader>
