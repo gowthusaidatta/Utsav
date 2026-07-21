@@ -37,12 +37,12 @@ function MyDelegations() {
 
   return (
     <main className="container mx-auto max-w-4xl px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">My delegations</h1>
-        <p className="text-sm text-muted-foreground">
-          Roles delegated to you, and roles you've delegated to others.
-        </p>
-      </div>
+      <PageHeader
+        title="My delegations"
+        subtitle="Roles delegated to you, and roles you've delegated to others."
+      />
+
+
 
       <Card>
         <CardHeader>
