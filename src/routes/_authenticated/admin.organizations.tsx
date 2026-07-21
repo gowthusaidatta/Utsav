@@ -27,6 +27,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PageHeader } from "@/components/PageHeader";
+import { EmptyState, ErrorState } from "@/components/EmptyState";
+import { Building2 } from "lucide-react";
+
+
 
 const ORG_TYPES = ["college", "department", "club", "external"] as const;
 
@@ -66,12 +71,13 @@ function OrganizationsPage() {
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Organizations</h1>
-        <p className="text-sm text-muted-foreground">
-          Colleges, departments, clubs and partners that host events on Utsav.
-        </p>
-      </div>
+      <PageHeader
+        breadcrumbs={[{ label: "Admin", to: "/admin/users" }, { label: "Organizations" }]}
+        title="Organizations"
+        subtitle="Colleges, departments, clubs and partners that host events on Utsav."
+      />
+
+
 
       <Card>
         <CardHeader>
@@ -141,7 +147,13 @@ function OrganizationsPage() {
         </CardHeader>
         <CardContent className="overflow-x-auto">
           {orgs.isError ? (
-            <p className="text-sm text-destructive">Failed to load organizations.</p>
+            <ErrorState title="Failed to load organizations" />
+          ) : (orgs.data ?? []).length === 0 && !orgs.isLoading ? (
+            <EmptyState
+              icon={<Building2 className="h-6 w-6" />}
+              title="No organizations yet"
+              description="Create the first organization above to start hosting events."
+            />
           ) : (
             <Table>
               <TableHeader>
@@ -174,19 +186,10 @@ function OrganizationsPage() {
                     </TableCell>
                   </TableRow>
                 ))}
-                {(orgs.data ?? []).length === 0 && !orgs.isLoading && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center text-sm text-muted-foreground"
-                    >
-                      No organizations yet.
-                    </TableCell>
-                  </TableRow>
-                )}
               </TableBody>
             </Table>
           )}
+
         </CardContent>
       </Card>
     </main>

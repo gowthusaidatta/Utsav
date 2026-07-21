@@ -28,6 +28,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PageHeader } from "@/components/PageHeader";
+import { EmptyState, ErrorState } from "@/components/EmptyState";
+import { KeyRound } from "lucide-react";
+
+
 
 const ROLES = ["organizer", "coordinator", "judge", "volunteer", "faculty", "admin"] as const;
 const SCOPES = ["global", "organization", "event"] as const;
@@ -89,22 +94,22 @@ function DelegationsPage() {
   if (rows.isError)
     return (
       <main className="container mx-auto px-4 py-8">
-        <p className="text-sm text-destructive">
-          {(rows.error as Error).message === "Forbidden"
-            ? "Admins only."
-            : "Failed to load."}
-        </p>
+        <ErrorState
+          title={(rows.error as Error).message === "Forbidden" ? "Admins only" : "Failed to load"}
+          description={(rows.error as Error).message}
+        />
       </main>
     );
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Permission delegations</h1>
-        <p className="text-sm text-muted-foreground">
-          Grant time-boxed scoped roles. Revocation is immediate.
-        </p>
-      </div>
+      <PageHeader
+        breadcrumbs={[{ label: "Admin", to: "/admin/users" }, { label: "Delegations" }]}
+        title="Permission delegations"
+        subtitle="Grant time-boxed scoped roles. Revocation is immediate."
+      />
+
+
 
       <Card>
         <CardHeader>
@@ -249,11 +254,16 @@ function DelegationsPage() {
               })}
               {(rows.data ?? []).length === 0 && !rows.isLoading && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
-                    No delegations yet.
+                  <TableCell colSpan={6}>
+                    <EmptyState
+                      icon={<KeyRound className="h-6 w-6" />}
+                      title="No delegations yet"
+                      description="Grant a time-boxed role above to delegate access."
+                    />
                   </TableCell>
                 </TableRow>
               )}
+
             </TableBody>
           </Table>
         </CardContent>

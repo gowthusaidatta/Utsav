@@ -31,6 +31,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PageHeader } from "@/components/PageHeader";
+import { ErrorState, EmptyState } from "@/components/EmptyState";
+import { UserCheck } from "lucide-react";
+
+
 
 export const Route = createFileRoute("/_authenticated/admin/user-approvals")({
   head: () => ({ meta: [{ title: "Admin · Account Approvals — Utsav" }] }),
@@ -81,20 +86,25 @@ function UserApprovalsPage() {
   if (pending.isError) {
     return (
       <main className="container mx-auto px-4 py-8">
-        <p className="text-destructive">{(pending.error as Error).message}</p>
+        <ErrorState title="Failed to load approvals" description={(pending.error as Error).message} />
       </main>
     );
   }
 
   return (
     <main className="container mx-auto max-w-6xl px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Account approvals</h1>
-        <div className="text-sm text-muted-foreground">
-          Verify identity documents and assign a role strictly below your own rank.
-          Your rank: <Badge variant="secondary">{actorRank}</Badge>
-        </div>
-      </div>
+      <PageHeader
+        breadcrumbs={[{ label: "Admin", to: "/admin/users" }, { label: "Account approvals" }]}
+        title="Account approvals"
+        subtitle={
+          <>
+            Verify identity documents and assign a role strictly below your own rank. Your rank:{" "}
+            <Badge variant="secondary">{actorRank}</Badge>
+          </>
+        }
+      />
+
+
 
       <Card>
         <CardHeader>
@@ -195,11 +205,16 @@ function UserApprovalsPage() {
               })}
               {(pending.data ?? []).length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
-                    No pending accounts.
+                  <TableCell colSpan={5}>
+                    <EmptyState
+                      icon={<UserCheck className="h-6 w-6" />}
+                      title="No pending accounts"
+                      description="New Faculty and Coordinator signups will appear here for approval."
+                    />
                   </TableCell>
                 </TableRow>
               )}
+
             </TableBody>
           </Table>
         </CardContent>
