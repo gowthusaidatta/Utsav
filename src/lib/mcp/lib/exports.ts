@@ -1,5 +1,6 @@
-import ExcelJS from "exceljs";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+// pdf-lib and exceljs are dynamically imported inside the functions that use them
+// to keep them out of the shared SSR router chunk (they break at module init on
+// Cloudflare Workers).
 
 export type Row = Record<string, unknown>;
 
