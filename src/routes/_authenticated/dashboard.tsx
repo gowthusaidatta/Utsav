@@ -38,11 +38,19 @@ function Dashboard() {
   const canCreateEvent = activeRoles.some((r) =>
     ["admin", "super_admin", "platform_admin", "org_admin", "college_admin", "dept_admin", "faculty", "organizer", "coordinator"].includes(r.role),
   );
+  const canScan = activeRoles.some((r) =>
+    ["admin","super_admin","platform_admin","org_admin","college_admin","dept_admin","coordinator","student_coordinator","organizer","faculty","volunteer"].includes(r.role),
+  );
+  const isAdminLike = activeRoles.some((r) =>
+    ["admin","super_admin","platform_admin","org_admin","college_admin","dept_admin"].includes(r.role),
+  );
 
   const quickLinks: Array<{ to: string; label: string; icon: React.ReactNode; desc: string }> = [
     { to: "/my-events", label: "My events", icon: <CalendarDays className="h-4 w-4" />, desc: "Events you manage or organize" },
     { to: "/my-registrations", label: "My registrations", icon: <Ticket className="h-4 w-4" />, desc: "Events you're registered for" },
     { to: "/events", label: "Browse events", icon: <CalendarDays className="h-4 w-4" />, desc: "Discover upcoming events" },
+    ...(canScan ? [{ to: "/scan", label: "Scan attendance", icon: <ScanLine className="h-4 w-4" />, desc: "Scan QR codes to check in participants" }] : []),
+    ...(isAdminLike ? [{ to: "/admin/users", label: "Manage users", icon: <Users className="h-4 w-4" />, desc: "Create users, bulk import, assign roles" }] : []),
     { to: "/notifications", label: "Notifications", icon: <Bell className="h-4 w-4" />, desc: "Announcements & updates" },
     { to: "/delegations", label: "Delegations", icon: <Users className="h-4 w-4" />, desc: "Roles delegated to you" },
     { to: "/profile", label: "Profile & certificates", icon: <Award className="h-4 w-4" />, desc: "Your identity and awards" },
