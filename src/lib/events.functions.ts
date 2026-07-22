@@ -590,12 +590,35 @@ export const cancelEvent = createServerFn({ method: "POST" })
     // Permission gate via user-scoped client (RLS applies).
     const { data: current, error: fErr } = await context.supabase
       .from("events")
-      .select("id, title, status, created_by")
+      .select("id, title, status, created_by, organization_id")
       .eq("id", data.id)
       .maybeSingle();
     if (fErr) throw new Error(fErr.message);
     if (!current) throw new Error("Event not found or access denied");
     if (current.status === "cancelled") return { ok: true, already: true };
+
+    // Authorize: only the creator, event staff, or global admin/faculty may cancel.
+    const isOwner = current.created_by === context.userId;
+    const [{ data: isAdmin }, { data: isFaculty }, { data: isStaff }] =
+      await Promise.all([
+        context.supabase.rpc("has_global_role", {
+          _uid: context.userId,
+          _role: "admin",
+        }),
+        context.supabase.rpc("has_global_role", {
+          _uid: context.userId,
+          _role: "faculty",
+        }),
+        context.supabase.rpc("has_any_role_in_event", {
+          _uid: context.userId,
+          _roles: ["coordinator", "organizer", "faculty", "admin"],
+          _event: data.id,
+        }),
+      ]);
+    if (!isOwner && !isAdmin && !isFaculty && !isStaff) {
+      throw new Error("Forbidden: you cannot cancel this event");
+    }
+
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const nowIso = new Date().toISOString();
