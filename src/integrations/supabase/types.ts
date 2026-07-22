@@ -439,7 +439,6 @@ export type Database = {
           organization_id: string | null
           price: number
           published_at: string | null
-          qr_secret: string
           registration_deadline: string | null
           registration_type: string
           slug: string
@@ -480,7 +479,6 @@ export type Database = {
           organization_id?: string | null
           price?: number
           published_at?: string | null
-          qr_secret?: string
           registration_deadline?: string | null
           registration_type?: string
           slug: string
@@ -521,7 +519,6 @@ export type Database = {
           organization_id?: string | null
           price?: number
           published_at?: string | null
-          qr_secret?: string
           registration_deadline?: string | null
           registration_type?: string
           slug?: string
