@@ -528,6 +528,98 @@ function ManageEvent() {
               </div>
             )}
 
+            <div className="rounded-lg border p-4 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold">Participation</h3>
+                <p className="text-xs text-muted-foreground">
+                  Locks automatically once the first registration exists.
+                </p>
+              </div>
+              <F label="Participation type">
+                <Select
+                  value={form.registration_type}
+                  onValueChange={(v) => setForm({ ...form, registration_type: v as "individual" | "team" })}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="individual">Solo Event</SelectItem>
+                    <SelectItem value="team">Team Event</SelectItem>
+                  </SelectContent>
+                </Select>
+              </F>
+
+              {form.registration_type === "team" && (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <F label="Min team size">
+                      <Input
+                        type="number"
+                        min={2}
+                        max={100}
+                        value={form.min_team_size}
+                        onChange={(e) => setForm({ ...form, min_team_size: e.target.value })}
+                      />
+                    </F>
+                    <F label="Max team size">
+                      <Input
+                        type="number"
+                        min={2}
+                        max={100}
+                        value={form.max_team_size}
+                        onChange={(e) => setForm({ ...form, max_team_size: e.target.value })}
+                      />
+                    </F>
+                    <F label="Max teams (optional)">
+                      <Input
+                        type="number"
+                        min={1}
+                        value={form.max_teams}
+                        onChange={(e) => setForm({ ...form, max_teams: e.target.value })}
+                      />
+                    </F>
+                  </div>
+                  <F label="Attendance rule">
+                    <Select
+                      value={form.attendance_rule}
+                      onValueChange={(v) => setForm({ ...form, attendance_rule: v as EventForm["attendance_rule"] })}
+                    >
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="member">Any member counts individually</SelectItem>
+                        <SelectItem value="leader">Only leader's check-in counts</SelectItem>
+                        <SelectItem value="any_member">Any one member counts for the team</SelectItem>
+                        <SelectItem value="all_members">All members must check in</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </F>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {([
+                      ["allow_name", "Allow custom team name"],
+                      ["allow_description", "Allow team description"],
+                      ["allow_logo", "Allow team logo"],
+                      ["allow_leader_transfer", "Allow leader transfer"],
+                      ["invite_by_username", "Invite by username"],
+                      ["invite_by_email", "Invite by email"],
+                      ["auto_accept", "Auto-accept invitations"],
+                      ["require_full_team", "Require full team before registration"],
+                    ] as const).map(([key, label]) => (
+                      <label key={key} className="flex items-center gap-2 text-sm">
+                        <Checkbox
+                          checked={form.team_config[key]}
+                          onCheckedChange={(v) =>
+                            setForm({ ...form, team_config: { ...form.team_config, [key]: !!v } })
+                          }
+                        />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+
+
             <div className="flex flex-wrap justify-between gap-2 pt-2">
               <Button type="submit" disabled={busy}>
                 {busy ? "Saving…" : "Save changes"}
