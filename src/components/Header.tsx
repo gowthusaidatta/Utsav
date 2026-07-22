@@ -106,6 +106,16 @@ export function Header() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/notifications" })}>
                   <Bell className="mr-2 h-4 w-4" /> Notifications
                 </DropdownMenuItem>
+                {canScan && (
+                  <DropdownMenuItem onClick={() => navigate({ to: "/scan" })}>
+                    <ScanLine className="mr-2 h-4 w-4" /> Scan attendance
+                  </DropdownMenuItem>
+                )}
+                {isAdminLike && (
+                  <DropdownMenuItem onClick={() => navigate({ to: "/admin/users" })}>
+                    <Users className="mr-2 h-4 w-4" /> Manage users
+                  </DropdownMenuItem>
+                )}
 
                 <DropdownMenuItem onClick={() => navigate({ to: "/delegations" })}>
                   <UserIcon className="mr-2 h-4 w-4" /> Delegations
