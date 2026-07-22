@@ -60,6 +60,21 @@ interface EventForm {
   currency: string;
   cover_image_url: string;
   tags: string;
+  registration_type: "individual" | "team";
+  min_team_size: string;
+  max_team_size: string;
+  max_teams: string;
+  attendance_rule: "member" | "leader" | "all_members" | "any_member";
+  team_config: {
+    allow_name: boolean;
+    allow_description: boolean;
+    allow_logo: boolean;
+    allow_leader_transfer: boolean;
+    invite_by_username: boolean;
+    invite_by_email: boolean;
+    auto_accept: boolean;
+    require_full_team: boolean;
+  };
 }
 
 function ManageEvent() {
