@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Users, UserPlus, User } from "lucide-react";
+import { Users, UserPlus } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/events/$slug/register")({
   head: () => ({ meta: [{ title: "Register — Utsav" }, { name: "robots", content: "noindex" }] }),

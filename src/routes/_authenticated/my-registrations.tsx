@@ -7,13 +7,11 @@ import { regenerateMyQr } from "@/lib/attendance.functions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Ticket, QrCode, RefreshCw } from "lucide-react";
+import { Calendar, Ticket, QrCode, RefreshCw, Copy, Users } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState, ListSkeleton } from "@/components/EmptyState";
 import { RegistrationQR } from "@/components/RegistrationQR";
-
-
 
 export const Route = createFileRoute("/_authenticated/my-registrations")({
   head: () => ({ meta: [{ title: "My Registrations — Utsav" }] }),
@@ -48,7 +46,7 @@ function MyRegs() {
   });
 
   return (
-    <main className="container mx-auto max-w-4xl px-4 py-6">
+    <main className="container mx-auto max-w-5xl px-4 py-6">
       <PageHeader
         icon={<Ticket className="h-5 w-5" />}
         breadcrumbs={[
@@ -74,7 +72,6 @@ function MyRegs() {
           />
         )}
         {q.data?.map((r) => <RegRow key={r.id} reg={r} onCancel={() => cancelM.mutate(r.id)} cancelling={cancelM.isPending} />)}
-
       </div>
     </main>
   );
@@ -88,14 +85,25 @@ type Reg = {
   qr_revoked_at: string | null;
   checked_in_at: string | null;
   event: unknown;
+  team: unknown;
 };
+
+function copy(text: string, label: string) {
+  navigator.clipboard.writeText(text).then(
+    () => toast.success(`${label} copied`),
+    () => toast.error("Copy failed"),
+  );
+}
 
 function RegRow({ reg, onCancel, cancelling }: { reg: Reg; onCancel: () => void; cancelling: boolean }) {
   const [showQR, setShowQR] = useState(false);
-  const ev = reg.event as { slug: string; title: string; start_at: string | null } | null;
+  const ev = reg.event as { slug: string; title: string; start_at: string | null; end_at: string | null; registration_type: string } | null;
+  const team = reg.team as { id: string; name: string; invite_code: string; max_size: number } | null;
   const regenFn = useServerFn(regenerateMyQr);
   const qc = useQueryClient();
   const canShowQR = reg.status === "registered" || reg.status === "checked_in";
+  const eventOver = ev?.end_at ? new Date(ev.end_at).getTime() < Date.now() : false;
+  const inviteLink = team ? `${typeof window !== "undefined" ? window.location.origin : ""}/events/${ev?.slug ?? ""}/register?code=${team.invite_code}` : "";
   const regen = useMutation({
     mutationFn: () => regenFn({ data: { registration_id: reg.id } }),
     onSuccess: () => {
@@ -108,15 +116,16 @@ function RegRow({ reg, onCancel, cancelling }: { reg: Reg; onCancel: () => void;
     <Card>
       <CardContent className="flex flex-col gap-4 py-4">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge variant={statusBadge(reg.status)}>{reg.status.replace("_", " ")}</Badge>
               {reg.payment_status !== "not_required" && (
                 <Badge variant="outline">Payment: {reg.payment_status}</Badge>
               )}
               {reg.checked_in_at && <Badge variant="secondary">Checked-in</Badge>}
+              {team && <Badge variant="outline"><Users className="mr-1 h-3 w-3" />{team.name}</Badge>}
             </div>
-            <div className="mt-2 font-medium">{ev?.title ?? "Event"}</div>
+            <div className="mt-2 font-medium truncate">{ev?.title ?? "Event"}</div>
             <div className="text-xs text-muted-foreground">
               {ev?.start_at ? new Date(ev.start_at).toLocaleString() : "Date TBA"}
             </div>
@@ -144,6 +153,29 @@ function RegRow({ reg, onCancel, cancelling }: { reg: Reg; onCancel: () => void;
             )}
           </div>
         </div>
+
+        {team && !eventOver && (
+          <div className="rounded-lg border bg-muted/20 p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Team invite code</div>
+                <div className="font-mono text-sm font-semibold truncate">{team.invite_code}</div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => copy(team.invite_code, "Invite code")}>
+                  <Copy className="mr-1 h-3 w-3" /> Code
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => copy(inviteLink, "Invite link")}>
+                  <Copy className="mr-1 h-3 w-3" /> Link
+                </Button>
+                <Button size="sm" variant="outline" asChild>
+                  <Link to="/teams/$id" params={{ id: team.id }}>Team page</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showQR && reg.qr_token && (
           <div className="rounded-lg border bg-muted/30 p-4">
             <RegistrationQR token={reg.qr_token} title={ev?.title ?? "Event pass"} />
@@ -159,4 +191,3 @@ function RegRow({ reg, onCancel, cancelling }: { reg: Reg; onCancel: () => void;
     </Card>
   );
 }
-
