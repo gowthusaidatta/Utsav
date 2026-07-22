@@ -12,7 +12,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket, Plus, Bell } from "lucide-react";
+import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket, Plus, Bell, ScanLine, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getMyRoles } from "@/lib/authz.functions";
+
+const SCAN_ROLES = new Set([
+  "super_admin","admin","platform_admin","org_admin","college_admin","dept_admin",
+  "coordinator","student_coordinator","organizer","faculty","volunteer",
+]);
+const ADMIN_ROLES = new Set(["super_admin","admin","platform_admin","org_admin","college_admin","dept_admin"]);
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationBell } from "@/components/NotificationBell";
 import { CommandPalette } from "@/components/CommandPalette";
@@ -29,6 +38,19 @@ export function Header() {
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
+
+  const rolesFn = useServerFn(getMyRoles);
+  const roles = useQuery({
+    queryKey: ["my-roles-nav"],
+    queryFn: () => rolesFn(),
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+  const activeRoleNames = (roles.data ?? [])
+    .filter((r) => !r.expires_at || new Date(r.expires_at) > new Date())
+    .map((r) => r.role as string);
+  const canScan = activeRoleNames.some((r) => SCAN_ROLES.has(r));
+  const isAdminLike = activeRoleNames.some((r) => ADMIN_ROLES.has(r));
 
   const displayName =
     (user?.user_metadata?.full_name as string | undefined) ??
@@ -84,6 +106,16 @@ export function Header() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/notifications" })}>
                   <Bell className="mr-2 h-4 w-4" /> Notifications
                 </DropdownMenuItem>
+                {canScan && (
+                  <DropdownMenuItem onClick={() => navigate({ to: "/scan" })}>
+                    <ScanLine className="mr-2 h-4 w-4" /> Scan attendance
+                  </DropdownMenuItem>
+                )}
+                {isAdminLike && (
+                  <DropdownMenuItem onClick={() => navigate({ to: "/admin/users" })}>
+                    <Users className="mr-2 h-4 w-4" /> Manage users
+                  </DropdownMenuItem>
+                )}
 
                 <DropdownMenuItem onClick={() => navigate({ to: "/delegations" })}>
                   <UserIcon className="mr-2 h-4 w-4" /> Delegations
