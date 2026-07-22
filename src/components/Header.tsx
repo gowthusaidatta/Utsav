@@ -12,7 +12,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket, Plus, Bell } from "lucide-react";
+import { CalendarDays, LogOut, User as UserIcon, LayoutDashboard, Ticket, Plus, Bell, ScanLine, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getMyRoles } from "@/lib/authz.functions";
+
+const SCAN_ROLES = new Set([
+  "super_admin","admin","platform_admin","org_admin","college_admin","dept_admin",
+  "coordinator","student_coordinator","organizer","faculty","volunteer",
+]);
+const ADMIN_ROLES = new Set(["super_admin","admin","platform_admin","org_admin","college_admin","dept_admin"]);
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationBell } from "@/components/NotificationBell";
 import { CommandPalette } from "@/components/CommandPalette";
