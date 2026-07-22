@@ -60,6 +60,21 @@ interface EventForm {
   currency: string;
   cover_image_url: string;
   tags: string;
+  registration_type: "individual" | "team";
+  min_team_size: string;
+  max_team_size: string;
+  max_teams: string;
+  attendance_rule: "member" | "leader" | "all_members" | "any_member";
+  team_config: {
+    allow_name: boolean;
+    allow_description: boolean;
+    allow_logo: boolean;
+    allow_leader_transfer: boolean;
+    invite_by_username: boolean;
+    invite_by_email: boolean;
+    auto_accept: boolean;
+    require_full_team: boolean;
+  };
 }
 
 function ManageEvent() {
@@ -80,6 +95,7 @@ function ManageEvent() {
 
   useEffect(() => {
     if (q.data && !form) {
+      const tc = (q.data.team_config ?? {}) as Partial<EventForm["team_config"]>;
       setForm({
         title: q.data.title,
         description: q.data.description ?? "",
@@ -97,6 +113,21 @@ function ManageEvent() {
         currency: q.data.currency ?? "INR",
         cover_image_url: q.data.cover_image_url ?? "",
         tags: (q.data.tags ?? []).join(", "),
+        registration_type: (q.data.registration_type ?? "individual") as "individual" | "team",
+        min_team_size: q.data.min_team_size?.toString() ?? "2",
+        max_team_size: q.data.max_team_size?.toString() ?? "4",
+        max_teams: q.data.max_teams?.toString() ?? "",
+        attendance_rule: (q.data.attendance_rule ?? "member") as EventForm["attendance_rule"],
+        team_config: {
+          allow_name: tc.allow_name ?? true,
+          allow_description: tc.allow_description ?? true,
+          allow_logo: tc.allow_logo ?? true,
+          allow_leader_transfer: tc.allow_leader_transfer ?? true,
+          invite_by_username: tc.invite_by_username ?? true,
+          invite_by_email: tc.invite_by_email ?? true,
+          auto_accept: tc.auto_accept ?? false,
+          require_full_team: tc.require_full_team ?? false,
+        },
       });
     }
   }, [q.data, form]);
@@ -149,6 +180,12 @@ function ManageEvent() {
           currency: form.currency || "INR",
           cover_image_url: form.cover_image_url || null,
           tags,
+          registration_type: form.registration_type,
+          min_team_size: form.registration_type === "team" ? Number(form.min_team_size || 2) : null,
+          max_team_size: form.registration_type === "team" ? Number(form.max_team_size || 4) : null,
+          max_teams: form.registration_type === "team" && form.max_teams ? Number(form.max_teams) : null,
+          attendance_rule: form.attendance_rule,
+          team_config: form.registration_type === "team" ? form.team_config : {},
         },
       });
       await qc.invalidateQueries({ queryKey: ["event", id] });
@@ -490,6 +527,98 @@ function ManageEvent() {
                 </F>
               </div>
             )}
+
+            <div className="rounded-lg border p-4 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold">Participation</h3>
+                <p className="text-xs text-muted-foreground">
+                  Locks automatically once the first registration exists.
+                </p>
+              </div>
+              <F label="Participation type">
+                <Select
+                  value={form.registration_type}
+                  onValueChange={(v) => setForm({ ...form, registration_type: v as "individual" | "team" })}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="individual">Solo Event</SelectItem>
+                    <SelectItem value="team">Team Event</SelectItem>
+                  </SelectContent>
+                </Select>
+              </F>
+
+              {form.registration_type === "team" && (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <F label="Min team size">
+                      <Input
+                        type="number"
+                        min={2}
+                        max={100}
+                        value={form.min_team_size}
+                        onChange={(e) => setForm({ ...form, min_team_size: e.target.value })}
+                      />
+                    </F>
+                    <F label="Max team size">
+                      <Input
+                        type="number"
+                        min={2}
+                        max={100}
+                        value={form.max_team_size}
+                        onChange={(e) => setForm({ ...form, max_team_size: e.target.value })}
+                      />
+                    </F>
+                    <F label="Max teams (optional)">
+                      <Input
+                        type="number"
+                        min={1}
+                        value={form.max_teams}
+                        onChange={(e) => setForm({ ...form, max_teams: e.target.value })}
+                      />
+                    </F>
+                  </div>
+                  <F label="Attendance rule">
+                    <Select
+                      value={form.attendance_rule}
+                      onValueChange={(v) => setForm({ ...form, attendance_rule: v as EventForm["attendance_rule"] })}
+                    >
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="member">Any member counts individually</SelectItem>
+                        <SelectItem value="leader">Only leader's check-in counts</SelectItem>
+                        <SelectItem value="any_member">Any one member counts for the team</SelectItem>
+                        <SelectItem value="all_members">All members must check in</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </F>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {([
+                      ["allow_name", "Allow custom team name"],
+                      ["allow_description", "Allow team description"],
+                      ["allow_logo", "Allow team logo"],
+                      ["allow_leader_transfer", "Allow leader transfer"],
+                      ["invite_by_username", "Invite by username"],
+                      ["invite_by_email", "Invite by email"],
+                      ["auto_accept", "Auto-accept invitations"],
+                      ["require_full_team", "Require full team before registration"],
+                    ] as const).map(([key, label]) => (
+                      <label key={key} className="flex items-center gap-2 text-sm">
+                        <Checkbox
+                          checked={form.team_config[key]}
+                          onCheckedChange={(v) =>
+                            setForm({ ...form, team_config: { ...form.team_config, [key]: !!v } })
+                          }
+                        />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+
 
             <div className="flex flex-wrap justify-between gap-2 pt-2">
               <Button type="submit" disabled={busy}>

@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Users, UserPlus, User } from "lucide-react";
+import { Users, UserPlus } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/events/$slug/register")({
   head: () => ({ meta: [{ title: "Register — Utsav" }, { name: "robots", content: "noindex" }] }),
@@ -81,6 +81,7 @@ function RegisterPage() {
   if (!event) return <main className="container mx-auto px-4 py-10">Event not found.</main>;
 
   const busy = soloMutation.isPending || teamMutation.isPending || joinMutation.isPending;
+  const isTeamEvent = event.registration_type === "team";
 
   return (
     <main className="container mx-auto max-w-3xl px-4 py-10">
@@ -91,64 +92,64 @@ function RegisterPage() {
       <p className="mt-1 text-sm text-muted-foreground">
         {event.is_paid ? `${event.currency} ${event.price} — payment via organizer` : "Free registration"}
         {event.capacity ? ` · Capacity ${event.capacity}` : ""}
+        {isTeamEvent ? ` · Team event (${event.min_team_size ?? 2}–${event.max_team_size ?? 4} members)` : " · Individual event"}
       </p>
 
-      <Tabs defaultValue="solo" className="mt-8">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="solo"><User className="mr-2 h-4 w-4" />Solo</TabsTrigger>
-          <TabsTrigger value="team"><Users className="mr-2 h-4 w-4" />Create Team</TabsTrigger>
-          <TabsTrigger value="join"><UserPlus className="mr-2 h-4 w-4" />Join Team</TabsTrigger>
-        </TabsList>
+      {isTeamEvent ? (
+        <Tabs defaultValue="team" className="mt-8">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="team"><Users className="mr-2 h-4 w-4" />Create Team</TabsTrigger>
+            <TabsTrigger value="join"><UserPlus className="mr-2 h-4 w-4" />Join Existing Team</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="solo">
-          <Card>
-            <CardHeader><CardTitle>Register as an individual</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="notes">Notes (optional)</Label>
-                <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Dietary needs, accessibility, etc." />
-              </div>
-              <Button disabled={busy} onClick={() => soloMutation.mutate()}>Confirm registration</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="team">
+            <Card>
+              <CardHeader><CardTitle>Create a team</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="tname">Team name</Label>
+                  <Input id="tname" value={teamName} onChange={(e) => setTeamName(e.target.value)} required minLength={2} />
+                </div>
+                <div>
+                  <Label htmlFor="tdesc">Description (optional)</Label>
+                  <Textarea id="tdesc" value={teamDesc} onChange={(e) => setTeamDesc(e.target.value)} />
+                </div>
+                <Button disabled={busy || teamName.trim().length < 2} onClick={() => teamMutation.mutate()}>
+                  Create team & register
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="team">
-          <Card>
-            <CardHeader><CardTitle>Create a team</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="tname">Team name</Label>
-                <Input id="tname" value={teamName} onChange={(e) => setTeamName(e.target.value)} required minLength={2} />
-              </div>
-              <div>
-                <Label htmlFor="tdesc">Description (optional)</Label>
-                <Textarea id="tdesc" value={teamDesc} onChange={(e) => setTeamDesc(e.target.value)} />
-              </div>
-              <Button disabled={busy || teamName.trim().length < 2} onClick={() => teamMutation.mutate()}>
-                Create team & register
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="join">
+            <Card>
+              <CardHeader><CardTitle>Join with invite code</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="code">Invite code</Label>
+                  <Input id="code" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="e.g. a1b2c3d4" />
+                </div>
+                <Button disabled={busy || inviteCode.trim().length < 4} onClick={() => joinMutation.mutate()}>
+                  Join team & register
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <Card className="mt-8">
+          <CardHeader><CardTitle>Register as an individual</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="notes">Notes (optional)</Label>
+              <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Dietary needs, accessibility, etc." />
+            </div>
+            <Button disabled={busy} onClick={() => soloMutation.mutate()}>Confirm registration</Button>
+          </CardContent>
+        </Card>
+      )}
 
-        <TabsContent value="join">
-          <Card>
-            <CardHeader><CardTitle>Join with invite code</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="code">Invite code</Label>
-                <Input id="code" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="e.g. a1b2c3d4" />
-              </div>
-              <Button disabled={busy || inviteCode.trim().length < 4} onClick={() => joinMutation.mutate()}>
-                Join team & register
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {teamsQ.data && teamsQ.data.length > 0 && (
+      {isTeamEvent && teamsQ.data && teamsQ.data.length > 0 && (
         <section className="mt-10">
           <h2 className="text-lg font-semibold">Existing teams ({teamsQ.data.length})</h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
