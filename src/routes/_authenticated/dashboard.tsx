@@ -17,6 +17,7 @@ import {
   Bell,
   Users,
   Award,
+  ScanLine,
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 
