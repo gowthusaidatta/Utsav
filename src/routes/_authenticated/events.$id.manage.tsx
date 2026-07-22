@@ -180,6 +180,12 @@ function ManageEvent() {
           currency: form.currency || "INR",
           cover_image_url: form.cover_image_url || null,
           tags,
+          registration_type: form.registration_type,
+          min_team_size: form.registration_type === "team" ? Number(form.min_team_size || 2) : null,
+          max_team_size: form.registration_type === "team" ? Number(form.max_team_size || 4) : null,
+          max_teams: form.registration_type === "team" && form.max_teams ? Number(form.max_teams) : null,
+          attendance_rule: form.attendance_rule,
+          team_config: form.registration_type === "team" ? form.team_config : {},
         },
       });
       await qc.invalidateQueries({ queryKey: ["event", id] });
