@@ -95,6 +95,7 @@ function ManageEvent() {
 
   useEffect(() => {
     if (q.data && !form) {
+      const tc = (q.data.team_config ?? {}) as Partial<EventForm["team_config"]>;
       setForm({
         title: q.data.title,
         description: q.data.description ?? "",
@@ -112,6 +113,21 @@ function ManageEvent() {
         currency: q.data.currency ?? "INR",
         cover_image_url: q.data.cover_image_url ?? "",
         tags: (q.data.tags ?? []).join(", "),
+        registration_type: (q.data.registration_type ?? "individual") as "individual" | "team",
+        min_team_size: q.data.min_team_size?.toString() ?? "2",
+        max_team_size: q.data.max_team_size?.toString() ?? "4",
+        max_teams: q.data.max_teams?.toString() ?? "",
+        attendance_rule: (q.data.attendance_rule ?? "member") as EventForm["attendance_rule"],
+        team_config: {
+          allow_name: tc.allow_name ?? true,
+          allow_description: tc.allow_description ?? true,
+          allow_logo: tc.allow_logo ?? true,
+          allow_leader_transfer: tc.allow_leader_transfer ?? true,
+          invite_by_username: tc.invite_by_username ?? true,
+          invite_by_email: tc.invite_by_email ?? true,
+          auto_accept: tc.auto_accept ?? false,
+          require_full_team: tc.require_full_team ?? false,
+        },
       });
     }
   }, [q.data, form]);
