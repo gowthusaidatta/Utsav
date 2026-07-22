@@ -39,6 +39,19 @@ export function Header() {
     navigate({ to: "/auth", replace: true });
   }
 
+  const rolesFn = useServerFn(getMyRoles);
+  const roles = useQuery({
+    queryKey: ["my-roles-nav"],
+    queryFn: () => rolesFn(),
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+  const activeRoleNames = (roles.data ?? [])
+    .filter((r) => !r.expires_at || new Date(r.expires_at) > new Date())
+    .map((r) => r.role as string);
+  const canScan = activeRoleNames.some((r) => SCAN_ROLES.has(r));
+  const isAdminLike = activeRoleNames.some((r) => ADMIN_ROLES.has(r));
+
   const displayName =
     (user?.user_metadata?.full_name as string | undefined) ??
     user?.email ??
